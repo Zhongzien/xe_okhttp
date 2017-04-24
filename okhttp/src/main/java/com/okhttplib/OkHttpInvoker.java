@@ -1,0 +1,100 @@
+package com.okhttplib;
+
+import com.okhttplib.annotation.RequestMethod;
+import com.okhttplib.config.Configuration;
+import com.okhttplib.callback.OnResultCallBack;
+import com.okhttplib.help.OKHttpCommand;
+
+import java.util.Map;
+
+import okhttp3.OkHttpClient;
+
+/**
+ * 命令请求者角色
+ */
+
+public class OkHttpInvoker implements OkHttpInter {
+
+    private static Configuration mConfig;
+
+    private Builder mBuilder;
+
+    static {
+        config(new Configuration.Builder().build());
+    }
+
+    private OkHttpInvoker(Builder builder) {
+        mBuilder = builder;
+    }
+
+    @Override
+    public void doPostAsync(final OnResultCallBack callBack) {
+        OKHttpCommand.getCommandBuilder().
+                setConfiguration(mConfig).
+                setInvokerBuilder(mBuilder.info).
+                setOnResultCallBack(callBack).
+                setRequestMehtod(RequestMethod.POST).
+                build().doRequestAsync();
+    }
+
+    @Override
+    public void doGetAsync(final OnResultCallBack callBack) {
+        OKHttpCommand.getCommandBuilder().
+                setConfiguration(mConfig).
+                setInvokerBuilder(mBuilder.info).
+                setOnResultCallBack(callBack).
+                setRequestMehtod(RequestMethod.GET).
+                build().doRequestAsync();
+    }
+
+    public static void config(Configuration config) {
+        mConfig = config;
+    }
+
+    public static Builder getDefaultBuilder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+
+        private HttpInfo info;
+
+        public Builder() {
+            info = new HttpInfo();
+        }
+
+        public Builder setUrl(String url) {
+            info.setUrl(url);
+            return this;
+        }
+
+        public Builder addParams(Map<String, Object> params) {
+            info.addParams(params);
+            return this;
+        }
+
+        public Builder addParam(String key, String value) {
+            info.addParam(key, value);
+            return this;
+        }
+
+        public Builder addHeads(Map<String, String> heads) {
+            info.addHeads(heads);
+            return this;
+        }
+
+        public Builder addHead(String key, String value) {
+            info.addHead(key, value);
+            return this;
+        }
+
+        public OkHttpInter build() {
+            return new OkHttpInvoker(this);
+        }
+
+    }
+
+    public void test() {
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+    }
+}

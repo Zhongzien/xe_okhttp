@@ -3,7 +3,6 @@ package com.okhttplib;
 import android.text.TextUtils;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 访问相关信息，包括访问和返回信息
@@ -14,15 +13,15 @@ public class HttpInfo {
     public HttpInfo() {
     }
 
-    private Map<String, Object> params;
+    private HashMap<String, String> params;
     private String url;
-    private Map<String, String> heads;
+    private HashMap<String, String> heads;
 
-    public Map<String, String> getHeads() {
+    public HashMap<String, String> getHeads() {
         return heads;
     }
 
-    public void addHeads(Map<String, String> heads) {
+    public void addHeads(HashMap<String, String> heads) {
         if (heads != null) {
             if (this.heads == null)
                 this.heads = new HashMap<>();
@@ -39,7 +38,7 @@ public class HttpInfo {
         }
     }
 
-    public void addParams(Map<String, Object> params) {
+    public void addParams(HashMap<String, String> params) {
         if (params != null) {
             if (this.params == null)
                 this.params = new HashMap<>();
@@ -60,7 +59,7 @@ public class HttpInfo {
         this.url = url;
     }
 
-    public Map<String, Object> getParams() {
+    public HashMap<String, String> getParams() {
         return params;
     }
 
@@ -74,6 +73,10 @@ public class HttpInfo {
     public final static int CHECK_URL = 0x02;
     public final static int CLIENT_4XX = 0x03;
     public final static int SERVICE_5XX = 0x04;
+    public final static int NETWORK_ON_MAIN_THREAD = 0x05;
+    public final static int CONNECTION_TIME_OUT = 0x06;
+    public final static int READ_OR_WRITE_TIME_OUT = 0x07;
+    public final static int ON_RESULT = 0x08;
 
     //返回参数
     private String msg;
@@ -100,6 +103,18 @@ public class HttpInfo {
                 break;
             case SERVICE_5XX:
                 msg = "服务器异常";
+                break;
+            case NETWORK_ON_MAIN_THREAD:
+                msg = "不允许在UI线程中进行网络操作";
+                break;
+            case CONNECTION_TIME_OUT:
+                msg = "连接超时";
+                break;
+            case READ_OR_WRITE_TIME_OUT:
+                msg = "读写超时";
+                break;
+            case ON_RESULT:
+                msg = "没有获取到数据";
                 break;
         }
         resultBody = body == null ? "" : body;

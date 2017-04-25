@@ -2,6 +2,8 @@ package com.okhttplib.callback;
 
 import android.telecom.Call;
 
+import com.okhttplib.HttpInfo;
+
 import java.io.Serializable;
 
 import okhttp3.Response;
@@ -12,7 +14,5 @@ import okhttp3.Response;
 
 public interface OnResultCallBack extends Serializable {
 
-    public void onSuccess(String result, String msg);
-
-    public void onFailure(String msg);
+    void onResponse(HttpInfo info);
 }

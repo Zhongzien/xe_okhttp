@@ -20,4 +20,18 @@ public interface OkHttpInter {
      */
     void doGetAsync(OnResultCallBack callBack);
 
+    /**
+     * 同步Post请求
+     *
+     * @return
+     */
+    void doPostSync(OnResultCallBack callBack);
+
+    /**
+     * 同步Get请求
+     *
+     * @return
+     */
+    void doGetSync(OnResultCallBack callBack);
+
 }

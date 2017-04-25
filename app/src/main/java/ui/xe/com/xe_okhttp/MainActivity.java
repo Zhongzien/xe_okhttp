@@ -1,16 +1,16 @@
 package ui.xe.com.xe_okhttp;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 
+import com.okhttplib.HttpInfo;
 import com.okhttplib.OkHttpInvoker;
 import com.okhttplib.callback.OnResultCallBack;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void doPostAsync(View v) {
-        Map<String, Object> map = new HashMap<>();
+        HashMap<String, String> map = new HashMap<>();
         map.put("app", "life.time");
         map.put("appkey", "10003");
         map.put("sign", "b59bc3ef6191eb9f747dd4e83c99f2a4");
@@ -32,13 +32,12 @@ public class MainActivity extends AppCompatActivity {
 
         OkHttpInvoker.getDefaultBuilder().setUrl("http://api.k780.com:88/").addParams(map).build().doPostAsync(new OnResultCallBack() {
             @Override
-            public void onSuccess(String result, String msg) {
-                Log.i(TAG, "doPostAsync:" + result);
-            }
-
-            @Override
-            public void onFailure(String msg) {
-                Log.i(TAG, "doPostAsync:" + msg);
+            public void onResponse(HttpInfo info) {
+                if (info.isSuccess()) {
+                    Log.i(TAG, "doPostAsync:" + info.getResultBody());
+                } else {
+                    Log.i(TAG, "doPostAsync:" + info.getMsg());
+                }
             }
         });
     }
@@ -49,16 +48,58 @@ public class MainActivity extends AppCompatActivity {
                 addParam("appkey", "10003").
                 addParam("sign", "b59bc3ef6191eb9f747dd4e83c99f2a4").
                 addParam("format", "json").build().doGetAsync(new OnResultCallBack() {
-            @Override
-            public void onSuccess(String result, String msg) {
-                Log.i(TAG, "doGetAsync:" + result);
-            }
 
             @Override
-            public void onFailure(String msg) {
-                Log.i(TAG, "doGetAsync:" + msg);
+            public void onResponse(HttpInfo info) {
+                if (info.isSuccess()) {
+                    Log.i(TAG, "doGetAsync:" + info.getResultBody());
+                } else {
+                    Log.i(TAG, "doGetAsync:" + info.getMsg());
+                }
             }
         });
-
     }
+
+    public void doPostSync(View v) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpInvoker.getDefaultBuilder().setUrl("http://api.k780.com:88/").
+                        addParam("app", "life.time").
+                        addParam("appkey", "10003").
+                        addParam("sign", "b59bc3ef6191eb9f747dd4e83c99f2a4").
+                        addParam("format", "json").build().
+                        doPostSync(new OnResultCallBack() {
+                            @Override
+                            public void onResponse(HttpInfo info) {
+                                if (info.isSuccess()) {
+                                    Log.i(TAG, "doPostSync:" + info.getResultBody());
+                                } else {
+                                    Log.i(TAG, "doPostSync:" + info.getMsg());
+                                }
+                            }
+                        });
+            }
+        }).start();
+    }
+
+    public void doGetSync(View v) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpInvoker.getDefaultBuilder().setUrl(url).build().
+                        doGetSync(new OnResultCallBack() {
+                            @Override
+                            public void onResponse(HttpInfo info) {
+                                if (info.isSuccess()) {
+                                    Log.i(TAG, "doGetSync:" + info.getResultBody());
+                                } else {
+                                    Log.i(TAG, "doGetAsync:" + info.getMsg());
+                                }
+                            }
+                        });
+            }
+        }).start();
+    }
+
 }

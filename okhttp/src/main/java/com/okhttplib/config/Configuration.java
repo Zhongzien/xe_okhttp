@@ -1,6 +1,7 @@
 package com.okhttplib.config;
 
-import com.okhttplib.interceptor.OkHttpInterceptor;
+import com.okhttplib.interceptor.MsgInterceptor;
+import com.okhttplib.interceptor.ParamsInterceptor;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public final class Configuration implements Cloneable {
     }
 
     @Override
-    public Configuration clone() throws CloneNotSupportedException {
+    public Configuration clone() {
         try {
             Configuration config = (Configuration) super.clone();
             config.mBuilder = mBuilder.clone();
@@ -49,7 +50,8 @@ public final class Configuration implements Cloneable {
         private File cacheFile;
         private long cacheMaxSize;
 
-        private List<OkHttpInterceptor> okHttpInterceptors;
+        private List<MsgInterceptor> okHttpInterceptors;
+        private ParamsInterceptor paramsInterceptor;
 
         public Builder() {
             initDefaultConfig();
@@ -118,7 +120,12 @@ public final class Configuration implements Cloneable {
             return this;
         }
 
-        public Builder addOkHttpInterceptor(OkHttpInterceptor interceptor) {
+        public Builder addParamsInterceptor(ParamsInterceptor interceptor) {
+            paramsInterceptor = interceptor;
+            return this;
+        }
+
+        public Builder addMsgInterceptor(MsgInterceptor interceptor) {
             if (interceptor != null) {
                 if (okHttpInterceptors == null)
                     okHttpInterceptors = new ArrayList<>();
@@ -157,7 +164,11 @@ public final class Configuration implements Cloneable {
         return mBuilder.timeUnit;
     }
 
-    public List<OkHttpInterceptor> getOkHttpInterceptors() {
+    public ParamsInterceptor getParamsInterceptor() {
+        return mBuilder.paramsInterceptor;
+    }
+
+    public List<MsgInterceptor> getMsgInterceptor() {
         return mBuilder.okHttpInterceptors;
     }
 }

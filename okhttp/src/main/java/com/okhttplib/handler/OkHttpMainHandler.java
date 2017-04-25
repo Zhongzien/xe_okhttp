@@ -40,11 +40,7 @@ public class OkHttpMainHandler extends Handler {
             switch (msg.what) {
                 case RESPONSE_HTTP:
                     OkRequestMessage rMsg = (OkRequestMessage) msg.obj;
-                    if (rMsg.info.isSuccess()) {
-                        rMsg.callBack.onSuccess(rMsg.info.getResultBody(), rMsg.info.getMsg());
-                    } else {
-                        rMsg.callBack.onFailure(rMsg.info.getMsg());
-                    }
+                    rMsg.callBack.onResponse(rMsg.info);
                     break;
             }
         } catch (Exception e) {

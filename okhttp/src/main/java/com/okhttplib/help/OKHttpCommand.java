@@ -34,8 +34,8 @@ public class OKHttpCommand {
         httpPerformer.doRequestAsync(this);
     }
 
-    public void doRequestSncy() {
-
+    public void doRequestSync() {
+        httpPerformer.doRequestSync(this);
     }
 
     public static Builder getCommandBuilder() {
@@ -54,7 +54,7 @@ public class OKHttpCommand {
         public Builder() {
         }
 
-        public Builder setRequestMehtod(@RequestMethod int method) {
+        public Builder setRequestMethod(@RequestMethod int method) {
             requestMethod = method;
             return this;
         }

@@ -5,7 +5,7 @@ import com.okhttplib.config.Configuration;
 import com.okhttplib.callback.OnResultCallBack;
 import com.okhttplib.help.OKHttpCommand;
 
-import java.util.Map;
+import java.util.HashMap;
 
 import okhttp3.OkHttpClient;
 
@@ -33,7 +33,7 @@ public class OkHttpInvoker implements OkHttpInter {
                 setConfiguration(mConfig).
                 setInvokerBuilder(mBuilder.info).
                 setOnResultCallBack(callBack).
-                setRequestMehtod(RequestMethod.POST).
+                setRequestMethod(RequestMethod.POST).
                 build().doRequestAsync();
     }
 
@@ -43,8 +43,28 @@ public class OkHttpInvoker implements OkHttpInter {
                 setConfiguration(mConfig).
                 setInvokerBuilder(mBuilder.info).
                 setOnResultCallBack(callBack).
-                setRequestMehtod(RequestMethod.GET).
+                setRequestMethod(RequestMethod.GET).
                 build().doRequestAsync();
+    }
+
+    @Override
+    public void doPostSync(OnResultCallBack callBack) {
+        OKHttpCommand.getCommandBuilder().
+                setConfiguration(mConfig).
+                setInvokerBuilder(mBuilder.info).
+                setOnResultCallBack(callBack).
+                setRequestMethod(RequestMethod.POST).
+                build().doRequestSync();
+    }
+
+    @Override
+    public void doGetSync(OnResultCallBack callBack) {
+        OKHttpCommand.getCommandBuilder().
+                setConfiguration(mConfig).
+                setInvokerBuilder(mBuilder.info).
+                setOnResultCallBack(callBack).
+                setRequestMethod(RequestMethod.GET).
+                build().doRequestSync();
     }
 
     public static void config(Configuration config) {
@@ -68,7 +88,7 @@ public class OkHttpInvoker implements OkHttpInter {
             return this;
         }
 
-        public Builder addParams(Map<String, Object> params) {
+        public Builder addParams(HashMap<String, String> params) {
             info.addParams(params);
             return this;
         }
@@ -78,7 +98,7 @@ public class OkHttpInvoker implements OkHttpInter {
             return this;
         }
 
-        public Builder addHeads(Map<String, String> heads) {
+        public Builder addHeads(HashMap<String, String> heads) {
             info.addHeads(heads);
             return this;
         }

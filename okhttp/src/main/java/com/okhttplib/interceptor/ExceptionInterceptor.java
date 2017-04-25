@@ -6,7 +6,7 @@ import com.okhttplib.HttpInfo;
  * Created by Administrator on 2017/4/21 0021.
  */
 
-public class ExceptionInterceptor implements OkHttpInterceptor {
+public class ExceptionInterceptor implements MsgInterceptor {
 
     @Override
     public void intercept(HttpInfo info) {

@@ -1,6 +1,7 @@
 package com.okhttplib.help;
 
 import android.os.Message;
+import android.os.NetworkOnMainThreadException;
 import android.util.Log;
 
 import com.okhttplib.HttpInfo;
@@ -11,6 +12,8 @@ import com.okhttplib.callback.OnResultCallBack;
 import com.okhttplib.handler.OkHttpMainHandler;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.util.HashMap;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -64,7 +67,35 @@ public class OkHttpPerformer extends BasicOkPerformer {
     }
 
     @Override
-    public void doRequestSync() {
+    public void doRequestSync(OKHttpCommand command) {
+        final OnResultCallBack callBack = command.getCallBack();
+        if (callBack == null)
+            throw new NullPointerException("OnResultCallBack can not null!");
+        final HttpInfo info = command.getInfo();
+        if (!checkUrl(info.getUrl())) {
+            callBack.onResponse(updateInfo(info, HttpInfo.CHECK_URL));
+            return;
+        }
+        try {
+            Request request = buildRequest(command.getInfo(), command.getRequestMethod());
+            Call call = getOkHttpClient().newCall(request);
+            Response response = call.execute();
+            doResponse(info, response);
+        } catch (SocketTimeoutException e) {
+            if (null != e.getMessage()) {
+                if (e.getMessage().contains("failed to connect to"))
+                    updateInfo(info, HttpInfo.CONNECTION_TIME_OUT);
+                if (e.getMessage().equals("timeout"))
+                    updateInfo(info, HttpInfo.READ_OR_WRITE_TIME_OUT);
+            }
+            updateInfo(info, HttpInfo.READ_OR_WRITE_TIME_OUT);
+        } catch (NetworkOnMainThreadException e) {
+            updateInfo(info, HttpInfo.NETWORK_ON_MAIN_THREAD);
+        } catch (Exception e) {
+            updateInfo(info, HttpInfo.ON_RESULT);
+        } finally {
+            callBack.onResponse(info);
+        }
     }
 
     private HttpInfo doResponse(HttpInfo info, Response res) {
@@ -115,13 +146,17 @@ public class OkHttpPerformer extends BasicOkPerformer {
 
     private Request buildRequest(HttpInfo info, @RequestMethod int method) {
         Request.Builder builder = new Request.Builder();
+        HashMap<String, String> params = info.getParams();
+        if (paramsInterceptor != null) {
+            params = paramsInterceptor.intercept(params == null ? null : (HashMap<String, String>) params.clone());
+        }
         switch (method) {
             case RequestMethod.POST:
                 FormBody.Builder fBuilder = new FormBody.Builder();
-                if (info.getParams() != null && !info.getParams().isEmpty()) {
-                    for (String key : info.getParams().keySet()) {
-                        Object param = info.getParams().get(key);
-                        String value = param == null ? "" : String.valueOf(param);
+                if (params != null && !params.isEmpty()) {
+                    for (String key : params.keySet()) {
+                        String value = params.get(key);
+                        value = value == null ? "" : value;
                         fBuilder.add(key, value);
                     }
                 }
@@ -131,13 +166,13 @@ public class OkHttpPerformer extends BasicOkPerformer {
             case RequestMethod.GET:
                 StringBuilder urlIntegral = new StringBuilder();
                 urlIntegral.append(info.getUrl());
-                if (info.getParams() != null && !info.getParams().isEmpty()) {
+                if (params != null && !params.isEmpty()) {
                     if (urlIntegral.indexOf("?") < 0)
                         urlIntegral.append("?");
                     boolean isFirst = urlIntegral.toString().endsWith("?");
-                    for (String key : info.getParams().keySet()) {
-                        Object param = info.getParams().get(key);
-                        String value = param == null ? "" : String.valueOf(param);
+                    for (String key : params.keySet()) {
+                        String value = params.get(key);
+                        value = value == null ? "" : value;
                         if (isFirst) {
                             urlIntegral.append(key).append("=").append(value);
                             isFirst = false;

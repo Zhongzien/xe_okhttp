@@ -4,11 +4,11 @@ import android.text.TextUtils;
 
 import com.okhttplib.HttpInfo;
 import com.okhttplib.config.Configuration;
-import com.okhttplib.interceptor.OkHttpInterceptor;
+import com.okhttplib.interceptor.MsgInterceptor;
+import com.okhttplib.interceptor.ParamsInterceptor;
 
 import java.util.List;
 
-import okhttp3.Cache;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
@@ -20,10 +20,12 @@ public abstract class BasicOkPerformer {
 
     private static OkHttpClient mHttpClient;
 
-    private List<OkHttpInterceptor> okHttpInterceptors;
+    protected final List<MsgInterceptor> okHttpInterceptors;
+    protected final ParamsInterceptor paramsInterceptor;
 
     BasicOkPerformer(Configuration config) {
-        okHttpInterceptors = config.getOkHttpInterceptors();
+        okHttpInterceptors = config.getMsgInterceptor();
+        paramsInterceptor = config.getParamsInterceptor();
         newOkHttpClient(config);
     }
 
@@ -59,7 +61,7 @@ public abstract class BasicOkPerformer {
 
     protected void dealInterceptor(HttpInfo info) {
         if (okHttpInterceptors != null) {
-            for (OkHttpInterceptor interceptor : okHttpInterceptors) {
+            for (MsgInterceptor interceptor : okHttpInterceptors) {
                 interceptor.intercept(info);
             }
         }
@@ -67,6 +69,6 @@ public abstract class BasicOkPerformer {
 
     public abstract void doRequestAsync(OKHttpCommand command);
 
-    public abstract void doRequestSync();
+    public abstract void doRequestSync(OKHttpCommand command);
 
 }

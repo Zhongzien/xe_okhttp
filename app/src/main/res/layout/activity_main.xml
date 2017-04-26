@@ -16,17 +16,17 @@
         android:onClick="doGetAsync"
         android:text="DoGetAsync" />
 
-    <!--<Button-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:onClick="doPostAsync"-->
-    <!--android:text="DoPostAsync" />-->
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="doPostSync"
+        android:text="DoPostSync" />
 
-    <!--<Button-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:onClick="doPostAsync"-->
-    <!--android:text="DoPostAsync" />-->
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="doGetSync"
+        android:text="DoGetSync" />
 
 
 </LinearLayout>

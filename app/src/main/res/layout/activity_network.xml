@@ -8,25 +8,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="doPostAsync"
-        android:text="NETWORK" />
+        android:text="DoPostAsync" />
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="doGetAsync"
-        android:text="UPLOAD" />
+        android:text="DoGetAsync" />
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="doPostSync"
-        android:text="DOWNLOAD" />
+        android:text="DoPostSync" />
 
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="doGetSync"
-        android:text="BREAKPOINT_DOWNLOAD" />
+        android:text="DoGetSync" />
 
 
 </LinearLayout>

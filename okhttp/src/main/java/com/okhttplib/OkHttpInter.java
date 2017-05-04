@@ -34,4 +34,6 @@ public interface OkHttpInter {
      */
     void doGetSync(OnResultCallBack callBack);
 
+    void doUploadAsync(OnResultCallBack callBack);
+
 }

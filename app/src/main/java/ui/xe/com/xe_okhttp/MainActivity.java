@@ -1,5 +1,6 @@
 package ui.xe.com.xe_okhttp;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -24,82 +25,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void doPostAsync(View v) {
-        HashMap<String, String> map = new HashMap<>();
-        map.put("app", "life.time");
-        map.put("appkey", "10003");
-        map.put("sign", "b59bc3ef6191eb9f747dd4e83c99f2a4");
-        map.put("format", "json");
-
-        OkHttpInvoker.getDefaultBuilder().setUrl("http://api.k780.com:88/").addParams(map).build().doPostAsync(new OnResultCallBack() {
-            @Override
-            public void onResponse(HttpInfo info) {
-                if (info.isSuccess()) {
-                    Log.i(TAG, "doPostAsync:" + info.getResultBody());
-                } else {
-                    Log.i(TAG, "doPostAsync:" + info.getMsg());
-                }
-            }
-        });
+        startActivity(new Intent(this, NetWorkActivity.class));
     }
 
     public void doGetAsync(View v) {
-        OkHttpInvoker.getDefaultBuilder().setUrl("http://api.k780.com:88/").
-                addParam("app", "life.time").
-                addParam("appkey", "10003").
-                addParam("sign", "b59bc3ef6191eb9f747dd4e83c99f2a4").
-                addParam("format", "json").build().doGetAsync(new OnResultCallBack() {
-
-            @Override
-            public void onResponse(HttpInfo info) {
-                if (info.isSuccess()) {
-                    Log.i(TAG, "doGetAsync:" + info.getResultBody());
-                } else {
-                    Log.i(TAG, "doGetAsync:" + info.getMsg());
-                }
-            }
-        });
+        startActivity(new Intent(this, UploadActivity.class));
     }
 
     public void doPostSync(View v) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                OkHttpInvoker.getDefaultBuilder().setUrl("http://api.k780.com:88/").
-                        addParam("app", "life.time").
-                        addParam("appkey", "10003").
-                        addParam("sign", "b59bc3ef6191eb9f747dd4e83c99f2a4").
-                        addParam("format", "json").build().
-                        doPostSync(new OnResultCallBack() {
-                            @Override
-                            public void onResponse(HttpInfo info) {
-                                if (info.isSuccess()) {
-                                    Log.i(TAG, "doPostSync:" + info.getResultBody());
-                                } else {
-                                    Log.i(TAG, "doPostSync:" + info.getMsg());
-                                }
-                            }
-                        });
-            }
-        }).start();
+
     }
 
     public void doGetSync(View v) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                OkHttpInvoker.getDefaultBuilder().setUrl(url).build().
-                        doGetSync(new OnResultCallBack() {
-                            @Override
-                            public void onResponse(HttpInfo info) {
-                                if (info.isSuccess()) {
-                                    Log.i(TAG, "doGetSync:" + info.getResultBody());
-                                } else {
-                                    Log.i(TAG, "doGetAsync:" + info.getMsg());
-                                }
-                            }
-                        });
-            }
-        }).start();
+
     }
 
 }

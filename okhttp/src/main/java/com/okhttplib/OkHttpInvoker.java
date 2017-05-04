@@ -1,11 +1,13 @@
 package com.okhttplib;
 
 import com.okhttplib.annotation.RequestMethod;
+import com.okhttplib.bean.UploadFileInfo;
 import com.okhttplib.config.Configuration;
 import com.okhttplib.callback.OnResultCallBack;
 import com.okhttplib.help.OKHttpCommand;
 
 import java.util.HashMap;
+import java.util.List;
 
 import okhttp3.OkHttpClient;
 
@@ -67,6 +69,16 @@ public class OkHttpInvoker implements OkHttpInter {
                 build().doRequestSync();
     }
 
+    @Override
+    public void doUploadAsync(OnResultCallBack callBack) {
+        //// TODO: 2017/5/4 0004
+//        OKHttpCommand.getCommandBuilder().
+//                setConfiguration(mConfig).
+//                setInvokerBuilder(mBuilder.info).
+//                setOnResultCallBack(callBack).
+//                build().doFileUploadAsync();
+    }
+
     public static void config(Configuration config) {
         mConfig = config;
     }
@@ -105,6 +117,16 @@ public class OkHttpInvoker implements OkHttpInter {
 
         public Builder addHead(String key, String value) {
             info.addHead(key, value);
+            return this;
+        }
+
+        public Builder addUploadFiles(List<UploadFileInfo> files) {
+            info.setUploadFiles(files);
+            return this;
+        }
+
+        public Builder addUploadFile(String uploadFormat, String fileAbsolutePath) {
+            info.setUploadFiles(uploadFormat, fileAbsolutePath);
             return this;
         }
 

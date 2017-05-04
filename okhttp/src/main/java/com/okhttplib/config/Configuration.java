@@ -1,12 +1,16 @@
 package com.okhttplib.config;
 
+import com.okhttplib.interceptor.MediaTypeInterceptor;
 import com.okhttplib.interceptor.MsgInterceptor;
 import com.okhttplib.interceptor.ParamsInterceptor;
+import com.okhttplib.utils.DefaultUploadInterceptor;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.MultipartBody;
 
 /**
  * 全局配置文件
@@ -52,6 +56,7 @@ public final class Configuration implements Cloneable {
 
         private List<MsgInterceptor> okHttpInterceptors;
         private ParamsInterceptor paramsInterceptor;
+        private MediaTypeInterceptor mediaTypeInterceptor;
 
         public Builder() {
             initDefaultConfig();
@@ -76,6 +81,13 @@ public final class Configuration implements Cloneable {
             setReadTimeOut(DEFAULT_TIME_OUT);
             setWriteTimeOut(DEFAULT_TIME_OUT);
             setTimeUnit(TimeUnit.SECONDS);
+            mediaTypeInterceptor = new DefaultUploadInterceptor();
+        }
+
+        public Builder addMadiaTypeInterceptor(MediaTypeInterceptor interceptor) {
+            if (interceptor != null)
+                mediaTypeInterceptor = interceptor;
+            return this;
         }
 
         public Builder setCacheFile(File file) {
@@ -96,21 +108,21 @@ public final class Configuration implements Cloneable {
 
         public Builder setConnectTimeOut(long connectTimeOut) {
             if (connectTimeOut <= 0)
-                throw new IllegalArgumentException("connectTimeOut must be > 0");
+                throw new IllegalArgumentException("connectTimeOut can not less than zero");
             this.connectTimeOut = connectTimeOut;
             return this;
         }
 
         public Builder setReadTimeOut(long readTimeOut) {
             if (readTimeOut <= 0)
-                throw new IllegalArgumentException("");
+                throw new IllegalArgumentException("readTimeOut can not less than zero");
             this.readTimeOut = readTimeOut;
             return this;
         }
 
         public Builder setWriteTimeOut(long writeTimeOut) {
             if (readTimeOut <= 0)
-                throw new IllegalArgumentException("");
+                throw new IllegalArgumentException("writeTimeOut can not less than zero");
             this.writeTimeOut = writeTimeOut;
             return this;
         }
@@ -121,7 +133,8 @@ public final class Configuration implements Cloneable {
         }
 
         public Builder addParamsInterceptor(ParamsInterceptor interceptor) {
-            paramsInterceptor = interceptor;
+            if (interceptor != null)
+                paramsInterceptor = interceptor;
             return this;
         }
 
@@ -170,5 +183,9 @@ public final class Configuration implements Cloneable {
 
     public List<MsgInterceptor> getMsgInterceptor() {
         return mBuilder.okHttpInterceptors;
+    }
+
+    public MediaTypeInterceptor getMediaTypeInterceptor() {
+        return mBuilder.mediaTypeInterceptor;
     }
 }

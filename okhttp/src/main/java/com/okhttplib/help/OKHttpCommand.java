@@ -2,8 +2,11 @@ package com.okhttplib.help;
 
 import com.okhttplib.HttpInfo;
 import com.okhttplib.annotation.RequestMethod;
+import com.okhttplib.callback.FileObserver;
 import com.okhttplib.config.Configuration;
 import com.okhttplib.callback.OnResultCallBack;
+
+import okhttp3.Request;
 
 /**
  * 命令角色
@@ -23,11 +26,16 @@ public class OKHttpCommand {
 
     private OkHttpPerformer httpPerformer;
 
+    private OkUploadPerformer okUploadPerformer;
+
     private OKHttpCommand(Builder builder) {
         info = builder.info;
         requestMethod = builder.requestMethod;
         callBack = builder.callBack;
         httpPerformer = new OkHttpPerformer(builder.config);
+
+        if (info.getUploadFiles() != null && !info.getUploadFiles().isEmpty())
+            okUploadPerformer = new OkUploadPerformer(builder.config);
     }
 
     public void doRequestAsync() {
@@ -36,6 +44,14 @@ public class OKHttpCommand {
 
     public void doRequestSync() {
         httpPerformer.doRequestSync(this);
+    }
+
+    public void doFileUploadAsync() {
+        okUploadPerformer.doRequestAsync(this);
+    }
+
+    public void doFileUploadSync() {
+        okUploadPerformer.doRequestSync(this);
     }
 
     public static Builder getCommandBuilder() {
@@ -86,6 +102,10 @@ public class OKHttpCommand {
 
     public HttpInfo getInfo() {
         return info;
+    }
+
+    public FileObserver getFileObserver() {
+        return okUploadPerformer;
     }
 
     public

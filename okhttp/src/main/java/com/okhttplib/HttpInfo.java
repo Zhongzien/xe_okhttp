@@ -2,7 +2,11 @@ package com.okhttplib;
 
 import android.text.TextUtils;
 
+import com.okhttplib.bean.UploadFileInfo;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * 访问相关信息，包括访问和返回信息
@@ -13,6 +17,7 @@ public class HttpInfo {
     public HttpInfo() {
     }
 
+    //普通请求
     private HashMap<String, String> params;
     private String url;
     private HashMap<String, String> heads;
@@ -66,6 +71,30 @@ public class HttpInfo {
     public String getUrl() {
         return url;
     }
+
+    //文件上传下载
+    private List<UploadFileInfo> uploadFiles;
+
+    public List<UploadFileInfo> getUploadFiles() {
+        return uploadFiles;
+    }
+
+    public void setUploadFiles(List<UploadFileInfo> files) {
+        if (uploadFiles == null) {
+            uploadFiles = files;
+        } else {
+            uploadFiles.addAll(files);
+        }
+    }
+
+    public void setUploadFiles(String uploadFormat, String fileAbsolutePath) {
+        if (uploadFiles == null) uploadFiles = new ArrayList<>();
+
+        if (!TextUtils.isEmpty(fileAbsolutePath))
+            uploadFiles.add(new UploadFileInfo(uploadFormat, fileAbsolutePath));
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     //*****本地状态码*****/
     public final static int NET_SUCCESS = 0x00;

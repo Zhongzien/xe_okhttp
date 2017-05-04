@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.okhttplib.HttpInfo;
 import com.okhttplib.annotation.RequestMethod;
+import com.okhttplib.callback.FileObserver;
 import com.okhttplib.config.Configuration;
 import com.okhttplib.bean.OkRequestMessage;
 import com.okhttplib.callback.OnResultCallBack;
@@ -22,7 +23,9 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /**
- * Created by Administrator on 2017/4/19 0019.
+ * 网络请求执行者
+ * 负责普通的网络请求访问：get/post
+ * 分别提供同步和异步请求
  */
 
 public class OkHttpPerformer extends BasicOkPerformer {
@@ -44,8 +47,7 @@ public class OkHttpPerformer extends BasicOkPerformer {
             OkHttpMainHandler.getInstance().sendMessage(msg);
             return;
         }
-        final Request request = buildRequest(command.getInfo(), command.getRequestMethod());
-        Call call = getOkHttpClient().newCall(request);
+        Call call = getOkHttpClient().newCall(checkRequest(command));
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -77,8 +79,7 @@ public class OkHttpPerformer extends BasicOkPerformer {
             return;
         }
         try {
-            Request request = buildRequest(command.getInfo(), command.getRequestMethod());
-            Call call = getOkHttpClient().newCall(request);
+            Call call = getOkHttpClient().newCall(checkRequest(command));
             Response response = call.execute();
             doResponse(info, response);
         } catch (SocketTimeoutException e) {
@@ -98,56 +99,20 @@ public class OkHttpPerformer extends BasicOkPerformer {
         }
     }
 
-    private HttpInfo doResponse(HttpInfo info, Response res) {
-        try {
-            if (res != null) {
-                String body = res.body().string();
-                if (res.isSuccessful()) {
-                    return updateInfo(info, res.code(), HttpInfo.NET_SUCCESS, body);
-                } else {
-                    if (res.code() >= 400 && res.code() < 500) {
-                        return updateInfo(info, res.code(), HttpInfo.CLIENT_4XX, body);
-                    } else if (res.code() >= 500 && res.code() < 600) {
-                        return updateInfo(info, res.code(), HttpInfo.SERVICE_5XX, body);
-                    }
-                }
-            }
-            return updateInfo(info, HttpInfo.CHECK_URL);
-        } catch (Exception e) {
-            return updateInfo(info, HttpInfo.NET_FAILURE, "[" + e.getMessage() + "]");
-        } finally {
-            res.close();
+    private Request checkRequest(OKHttpCommand command) {
+        FileObserver observer = command.getFileObserver();
+        Request request = null;
+        if (observer != null) {
+            request = observer.getFileRequest(command.getInfo());
         }
-    }
-
-    private HttpInfo updateInfo(HttpInfo info, int localCode) {
-        // has no netCode and body
-        return updateInfo(info, localCode, localCode, null);
-    }
-
-    private HttpInfo updateInfo(HttpInfo info, int localCode, String body) {
-        // has no netCode
-        return updateInfo(info, localCode, localCode, body);
-    }
-
-    private HttpInfo updateInfo(HttpInfo info, int netCode, int localCode, String body) {
-        info.packInfo(netCode, localCode, body);
-        dealInterceptor(info);
-        return info;
-    }
-
-    void setRequestHeads(HttpInfo info, Request.Builder builder) {
-        if (info.getHeads() != null && !info.getHeads().isEmpty()) {
-            for (String key : info.getHeads().keySet()) {
-                builder.addHeader(key, info.getHeads().get(key));
-            }
-        }
+        return request == null ? buildRequest(command.getInfo(), command.getRequestMethod()) : request;
     }
 
     private Request buildRequest(HttpInfo info, @RequestMethod int method) {
         Request.Builder builder = new Request.Builder();
         HashMap<String, String> params = info.getParams();
         if (paramsInterceptor != null) {
+            //使用clone技术(原型模式)目的是防止原始数据被篡改
             params = paramsInterceptor.intercept(params == null ? null : (HashMap<String, String>) params.clone());
         }
         switch (method) {
@@ -189,6 +154,7 @@ public class OkHttpPerformer extends BasicOkPerformer {
                 Log.i("OkHttp", "default");
                 break;
         }
+        //配置http head
         setRequestHeads(info, builder);
         return builder.build();
     }

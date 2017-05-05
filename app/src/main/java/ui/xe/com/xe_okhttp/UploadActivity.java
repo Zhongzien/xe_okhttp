@@ -24,7 +24,6 @@ import ui.xe.com.xe_okhttp.util.FilePathUtil;
 
 public class UploadActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = UploadActivity.class.getSimpleName();
-//    private String url = "http://192.168.120.206:8080/office/upload/uploadFile";
 
     private String url = "http://192.168.1.128:8091/upload/uploadSingleImage";
 
@@ -100,9 +99,9 @@ public class UploadActivity extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onResponse(HttpInfo info) {
                         if (info.isSuccess()) {
-                            Log.i(TAG, "success:" + info.getResultBody());
+                            Log.i(TAG, "doUploadSync success:" + info.getResultBody());
                         } else {
-                            Log.i(TAG, "failure:" + info.getResultBody());
+                            Log.i(TAG, "doUploadSync failure:" + info.getResultBody());
                         }
                     }
                 });

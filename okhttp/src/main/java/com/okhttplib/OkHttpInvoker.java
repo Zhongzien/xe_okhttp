@@ -84,7 +84,7 @@ public class OkHttpInvoker implements OkHttpInter {
                 setConfiguration(mConfig).
                 setInvokerBuilder(mBuilder.info).
                 setOnResultCallBack(callBack).
-                build().doRequestSync();
+                build().doFileUploadSync();
     }
 
     public static void config(Configuration config) {

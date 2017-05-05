@@ -6,7 +6,8 @@ import android.util.Log;
 
 import com.okhttplib.HttpInfo;
 import com.okhttplib.annotation.RequestMethod;
-import com.okhttplib.callback.FileObserver;
+import com.okhttplib.help.inter.NetWorkInter;
+import com.okhttplib.help.inter.RequestBuildInter;
 import com.okhttplib.config.Configuration;
 import com.okhttplib.bean.OkRequestMessage;
 import com.okhttplib.callback.OnResultCallBack;
@@ -28,7 +29,7 @@ import okhttp3.Response;
  * 分别提供同步和异步请求
  */
 
-public class OkHttpPerformer extends BasicOkPerformer {
+public class OkHttpPerformer extends BasicOkPerformer implements NetWorkInter {
 
     OkHttpPerformer(Configuration config) {
         super(config);
@@ -100,10 +101,10 @@ public class OkHttpPerformer extends BasicOkPerformer {
     }
 
     private Request checkRequest(OKHttpCommand command) {
-        FileObserver observer = command.getFileObserver();
+        RequestBuildInter observer = command.getFileObserver();
         Request request = null;
         if (observer != null) {
-            request = observer.getFileRequest(command.getInfo());
+            request = observer.buildFileRequest(command.getInfo());
         }
         return request == null ? buildRequest(command.getInfo(), command.getRequestMethod()) : request;
     }

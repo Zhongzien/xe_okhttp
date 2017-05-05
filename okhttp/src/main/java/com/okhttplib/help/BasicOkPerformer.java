@@ -16,10 +16,10 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /**
- * 抽象命令执行者
+ * 命令执行者基类
  */
 
-public abstract class BasicOkPerformer {
+public class BasicOkPerformer {
 
     private static OkHttpClient mHttpClient;
 
@@ -117,9 +117,4 @@ public abstract class BasicOkPerformer {
             }
         }
     }
-
-    public abstract void doRequestAsync(OKHttpCommand command);
-
-    public abstract void doRequestSync(OKHttpCommand command);
-
 }

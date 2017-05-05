@@ -2,8 +2,9 @@ package com.okhttplib.help;
 
 import com.okhttplib.HttpInfo;
 import com.okhttplib.bean.UploadFileInfo;
-import com.okhttplib.callback.FileObserver;
+import com.okhttplib.help.inter.RequestBuildInter;
 import com.okhttplib.config.Configuration;
+import com.okhttplib.help.inter.UploadInter;
 
 import java.io.File;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ import okhttp3.RequestBody;
  * 分别提供同步和异步请求
  */
 
-public class OkUploadPerformer extends BasicOkPerformer implements FileObserver {
+public class OkUploadPerformer extends BasicOkPerformer implements UploadInter {
 
     OkUploadPerformer(Configuration config) {
         super(config);
@@ -71,7 +72,7 @@ public class OkUploadPerformer extends BasicOkPerformer implements FileObserver 
     }
 
     @Override
-    public Request getFileRequest(HttpInfo info) {
+    public Request buildFileRequest(HttpInfo info) {
         return buildRequest(info);
     }
 }

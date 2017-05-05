@@ -1,4 +1,4 @@
-package com.okhttplib.callback;
+package com.okhttplib.help.inter;
 
 import com.okhttplib.HttpInfo;
 
@@ -8,8 +8,8 @@ import okhttp3.Request;
  * Created by Administrator on 2017/5/3 0003.
  */
 
-public interface FileObserver {
+public interface RequestBuildInter {
 
-    Request getFileRequest(HttpInfo info);
+    Request buildFileRequest(HttpInfo info);
 
 }

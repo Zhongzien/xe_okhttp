@@ -2,11 +2,11 @@ package com.okhttplib.help;
 
 import com.okhttplib.HttpInfo;
 import com.okhttplib.annotation.RequestMethod;
-import com.okhttplib.callback.FileObserver;
+import com.okhttplib.help.inter.NetWorkInter;
+import com.okhttplib.help.inter.RequestBuildInter;
 import com.okhttplib.config.Configuration;
 import com.okhttplib.callback.OnResultCallBack;
-
-import okhttp3.Request;
+import com.okhttplib.help.inter.UploadInter;
 
 /**
  * 命令角色
@@ -24,9 +24,9 @@ public class OKHttpCommand {
     @RequestMethod
     int requestMethod;
 
-    private OkHttpPerformer httpPerformer;
+    private NetWorkInter httpPerformer;
 
-    private OkUploadPerformer okUploadPerformer;
+    private UploadInter okUploadPerformer;
 
     private OKHttpCommand(Builder builder) {
         info = builder.info;
@@ -104,7 +104,7 @@ public class OKHttpCommand {
         return info;
     }
 
-    public FileObserver getFileObserver() {
+    public RequestBuildInter getFileObserver() {
         return okUploadPerformer;
     }
 

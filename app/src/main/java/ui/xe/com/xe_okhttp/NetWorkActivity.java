@@ -18,7 +18,6 @@ import java.util.HashMap;
 
 public class NetWorkActivity extends AppCompatActivity {
     private static final String TAG = NetWorkActivity.class.getSimpleName();
-    private String url = "http://api.k780.com:88/?app=life.time&appkey=10003&sign=b59bc3ef6191eb9f747dd4e83c99f2a4&format=json";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,12 +28,10 @@ public class NetWorkActivity extends AppCompatActivity {
 
     public void doPostAsync(View v) {
         HashMap<String, String> map = new HashMap<>();
-        map.put("app", "life.time");
-        map.put("appkey", "10003");
-        map.put("sign", "b59bc3ef6191eb9f747dd4e83c99f2a4");
-        map.put("format", "json");
+        map.put("username", "iyihua");
+        map.put("password", "123456");
 
-        OkHttpInvoker.getDefaultBuilder().setUrl("http://api.k780.com:88/").addParams(map).build().doPostAsync(new OnResultCallBack() {
+        OkHttpInvoker.getDefaultBuilder().setUrl("http://192.168.1.128:8091/login").addParams(map).build().doPostAsync(new OnResultCallBack() {
             @Override
             public void onResponse(HttpInfo info) {
                 if (info.isSuccess()) {
@@ -47,11 +44,8 @@ public class NetWorkActivity extends AppCompatActivity {
     }
 
     public void doGetAsync(View v) {
-        OkHttpInvoker.getDefaultBuilder().setUrl("http://api.k780.com:88/").
-                addParam("app", "life.time").
-                addParam("appkey", "10003").
-                addParam("sign", "b59bc3ef6191eb9f747dd4e83c99f2a4").
-                addParam("format", "json").build().doGetAsync(new OnResultCallBack() {
+        OkHttpInvoker.getDefaultBuilder().setUrl("http://192.168.1.128:8091/post/list").
+                addParam("cid", "1").build().doGetAsync(new OnResultCallBack() {
 
             @Override
             public void onResponse(HttpInfo info) {
@@ -68,11 +62,9 @@ public class NetWorkActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                OkHttpInvoker.getDefaultBuilder().setUrl("http://api.k780.com:88/").
-                        addParam("app", "life.time").
-                        addParam("appkey", "10003").
-                        addParam("sign", "b59bc3ef6191eb9f747dd4e83c99f2a4").
-                        addParam("format", "json").build().
+                OkHttpInvoker.getDefaultBuilder().setUrl("http://192.168.1.128:8091/login").
+                        addParam("username", "iyihua").
+                        addParam("password", "123456").build().
                         doPostSync(new OnResultCallBack() {
                             @Override
                             public void onResponse(HttpInfo info) {
@@ -91,7 +83,7 @@ public class NetWorkActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                OkHttpInvoker.getDefaultBuilder().setUrl(url).build().
+                OkHttpInvoker.getDefaultBuilder().setUrl("http://192.168.1.128:8091/post/list?cid=1").build().
                         doGetSync(new OnResultCallBack() {
                             @Override
                             public void onResponse(HttpInfo info) {

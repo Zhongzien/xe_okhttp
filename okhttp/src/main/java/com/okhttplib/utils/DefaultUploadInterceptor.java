@@ -12,7 +12,6 @@ public class DefaultUploadInterceptor implements MediaTypeInterceptor {
     @Override
     public String intercept(String filePath) {
 
-        if (!TextUtils.isEmpty(filePath)) {
             if(filePath.contains(".")){
                 String suffix = filePath.substring(filePath.indexOf(".") + 1);
                 if ("png".equals(suffix)) {
@@ -34,8 +33,6 @@ public class DefaultUploadInterceptor implements MediaTypeInterceptor {
             } else {
                 return "application/octet-stream";
             }
-        }
 
-        return "";
     }
 }

@@ -1,5 +1,7 @@
 package com.okhttplib.help;
 
+import android.text.TextUtils;
+
 import com.okhttplib.HttpInfo;
 import com.okhttplib.bean.UploadFileInfo;
 import com.okhttplib.help.inter.RequestBuildInter;
@@ -58,6 +60,10 @@ public class OkUploadPerformer extends BasicOkPerformer implements UploadInter {
             for (UploadFileInfo fileInfo : info.getUploadFiles()) {
                 String filePath = fileInfo.getFileAbsolutePath();
                 File file = new File(filePath);
+
+                if (TextUtils.isEmpty(filePath))
+                    throw new IllegalArgumentException("file path is illegal argument");
+
                 mbBuilder.addFormDataPart(fileInfo.getUploadFormat(),
                         file.getName(),
                         RequestBody.create(MediaType.parse(mediaTypeInterceptor.intercept(filePath)), file));

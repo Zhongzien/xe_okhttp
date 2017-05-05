@@ -1,6 +1,7 @@
-package com.okhttplib.interceptor;
+package com.okhttplib.utils;
 
 import com.okhttplib.HttpInfo;
+import com.okhttplib.interceptor.MsgInterceptor;
 
 /**
  * Created by Administrator on 2017/4/21 0021.

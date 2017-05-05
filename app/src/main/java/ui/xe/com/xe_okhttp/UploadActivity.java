@@ -2,12 +2,9 @@ package ui.xe.com.xe_okhttp;
 
 
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -27,8 +24,9 @@ import ui.xe.com.xe_okhttp.util.FilePathUtil;
 
 public class UploadActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = UploadActivity.class.getSimpleName();
-    private String url = "http://192.168.120.206:8080/office/upload/uploadFile";
+//    private String url = "http://192.168.120.206:8080/office/upload/uploadFile";
 
+    private String url = "http://192.168.1.128:8091/upload/uploadSingleImage";
 
     private String filePathOne;
     private String filePathTwo;
@@ -76,19 +74,56 @@ public class UploadActivity extends AppCompatActivity implements View.OnClickLis
                 break;
             case R.id.uploadImgBtnTwo:
                 if (!TextUtils.isEmpty(filePathTwo)) {
-//                    uploadImgTwo();
+                    uploadImgTwo();
                 } else {
                     Toast.makeText(this, "请先选择上传的图片！", Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.uploadImgBtnMulti:
                 if (!TextUtils.isEmpty(filePathOne) && !TextUtils.isEmpty(filePathTwo)) {
-//                    uploadImgMulti();
+                    uploadImgMulti();
                 } else {
                     Toast.makeText(this, "请先选择两张图片！", Toast.LENGTH_LONG).show();
                 }
                 break;
         }
+    }
+
+    private void uploadImgTwo() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                OkHttpInvoker.getDefaultBuilder().
+                        addUploadFile("file2", filePathTwo).
+                        setUrl(url).build().
+                        doUploadSync(new OnResultCallBack() {
+                    @Override
+                    public void onResponse(HttpInfo info) {
+                        if (info.isSuccess()) {
+                            Log.i(TAG, "success:" + info.getResultBody());
+                        } else {
+                            Log.i(TAG, "failure:" + info.getResultBody());
+                        }
+                    }
+                });
+            }
+        }).start();
+    }
+
+    private void uploadImgMulti() {
+        OkHttpInvoker.getDefaultBuilder().
+                setUrl(url).addUploadFile("file1", filePathOne).
+                addUploadFile("file2", filePathTwo).
+                build().doUploadAsync(new OnResultCallBack() {
+            @Override
+            public void onResponse(HttpInfo info) {
+                if (info.isSuccess()) {
+                    Log.i(TAG, "success:" + info.getResultBody());
+                } else {
+                    Log.i(TAG, "failure:" + info.getResultBody());
+                }
+            }
+        });
     }
 
     private void uploadImgOne() {
@@ -97,7 +132,7 @@ public class UploadActivity extends AppCompatActivity implements View.OnClickLis
                 build().doUploadAsync(new OnResultCallBack() {
             @Override
             public void onResponse(HttpInfo info) {
-                if(info.isSuccess()){
+                if (info.isSuccess()) {
                     Log.i(TAG, "success:" + info.getResultBody());
                 } else {
                     Log.i(TAG, "failure:" + info.getResultBody());

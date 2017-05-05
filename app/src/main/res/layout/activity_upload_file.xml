@@ -18,8 +18,7 @@
                 android:id="@+id/ivImageOne"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:scaleType="centerCrop"
-                 />
+                android:scaleType="centerCrop" />
 
             <ProgressBar
                 android:id="@+id/uploadProgressOne"
@@ -47,7 +46,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="upload" />
+                    android:text="async_upload" />
             </LinearLayout>
 
 
@@ -55,8 +54,7 @@
                 android:id="@+id/ivImageTwo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:scaleType="centerCrop"
-                 />
+                android:scaleType="centerCrop" />
 
             <ProgressBar
                 android:id="@+id/uploadProgressTwo"
@@ -84,7 +82,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="upload" />
+                    android:text="sync_upload" />
             </LinearLayout>
 
             <Button

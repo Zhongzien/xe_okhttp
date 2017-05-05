@@ -71,12 +71,20 @@ public class OkHttpInvoker implements OkHttpInter {
 
     @Override
     public void doUploadAsync(OnResultCallBack callBack) {
-        //// TODO: 2017/5/4 0004
-//        OKHttpCommand.getCommandBuilder().
-//                setConfiguration(mConfig).
-//                setInvokerBuilder(mBuilder.info).
-//                setOnResultCallBack(callBack).
-//                build().doFileUploadAsync();
+        OKHttpCommand.getCommandBuilder().
+                setConfiguration(mConfig).
+                setInvokerBuilder(mBuilder.info).
+                setOnResultCallBack(callBack).
+                build().doFileUploadAsync();
+    }
+
+    @Override
+    public void doUploadSync(OnResultCallBack callBack) {
+        OKHttpCommand.getCommandBuilder().
+                setConfiguration(mConfig).
+                setInvokerBuilder(mBuilder.info).
+                setOnResultCallBack(callBack).
+                build().doRequestSync();
     }
 
     public static void config(Configuration config) {

@@ -27,26 +27,25 @@ Configuration的配置方式
 异步请求
 
         方式一：
-        HashMap<String, String> map = new HashMap<>();
-        map.put("key", "value");
-        map.put("key", "value");
-        OkHttpInvoker.getDefaultBuilder().
-        setUrl("userURL").addParams(map).
-        build().doPostAsync(new OnResultCallBack() {
-            @Override
-            public void onResponse(HttpInfo info) {
-                if (info.isSuccess()) {
-                    Log.i(TAG, "doPostAsync:" + info.getResultBody());
-                } else {
-                    Log.i(TAG, "doPostAsync:" + info.getMsg());
-                }
-            }
-        });
+         HashMap<String, String> map = new HashMap<>();
+         map.put("username", "iyihua");
+         map.put("password", "123456");
+         OkHttpInvoker.getDefaultBuilder().setUrl("http://192.168.1.128:8091/login").
+         addParams(map).build().doPostAsync(new OnResultCallBack() {
+             @Override
+             public void onResponse(HttpInfo info) {
+                 if (info.isSuccess()) {
+                     Log.i(TAG, "doPostAsync:" + info.getResultBody());
+                 } else {
+                     Log.i(TAG, "doPostAsync:" + info.getMsg());
+                 }
+             }
+         });
         
         方式二：
-        OkHttpInvoker.getDefaultBuilder().setUrl("http://api.k780.com:88/").
-                        addParam("key", "value").                        
-                        addParam("key", "value").
+        OkHttpInvoker.getDefaultBuilder().setUrl("http://192.168.1.128:8091/login").
+                        addParam("username", "iyihua").
+                        addParam("password", "123456").
                         build().doPostAsync(new OnResultCallBack() {
                     @Override
                     public void onResponse(HttpInfo info) {
@@ -72,23 +71,23 @@ Configuration的配置方式
         同步请求同意提供POST和GET两种请求方式（doPostSync和doGetSync），的参数添加方式和异步的参数添加方式一样。
         例子如下：
         new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        OkHttpInvoker.getDefaultBuilder().setUrl("userURL").
-                                addParam("key", "value").                            
-                                addParam("key", "value").build().
-                                doPostSync(new OnResultCallBack() {
-                                    @Override
-                                    public void onResponse(HttpInfo info) {
-                                        if (info.isSuccess()) {
-                                            Log.i(TAG, "doPostSync:" + info.getResultBody());
-                                        } else {
-                                            Log.i(TAG, "doPostSync:" + info.getMsg());
-                                        }
-                                    }
-                                });
-                    }
-                }).start();
+            @Override
+            public void run() {
+                OkHttpInvoker.getDefaultBuilder().setUrl("http://192.168.1.128:8091/login").
+                        addParam("username", "iyihua").
+                        addParam("password", "123456").build().
+                        doPostSync(new OnResultCallBack() {
+                            @Override
+                            public void onResponse(HttpInfo info) {
+                                if (info.isSuccess()) {
+                                    Log.i(TAG, "doPostSync:" + info.getResultBody());
+                                } else {
+                                    Log.i(TAG, "doPostSync:" + info.getMsg());
+                                }
+                            }
+                        });
+            }
+        }).start();
 
 ##v2.0
 新增文件上传，支持多格式文件上传

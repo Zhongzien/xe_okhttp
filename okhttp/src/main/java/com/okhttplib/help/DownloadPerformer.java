@@ -24,7 +24,6 @@ import okhttp3.Response;
  */
 
 public class DownloadPerformer extends BasicOkPerformer {
-    String TAG = DownloadPerformer.class.getSimpleName();
 
     private OkHttpClient.Builder okBuilder;
     private String defaultDirPaht;

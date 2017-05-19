@@ -190,8 +190,8 @@ public class OkHttpInvoker implements OkHttpInter {
             return this;
         }
 
-        public Builder addDownloadFile(String url, String saveDir, String saveFileName) {
-            addDownloadFile(url, saveDir, saveFileName, null);
+        public Builder addDownloadFile(String url, String saveFileName, OnProgressCallBack callBack) {
+            addDownloadFile(url, null, saveFileName, callBack);
             return this;
         }
 

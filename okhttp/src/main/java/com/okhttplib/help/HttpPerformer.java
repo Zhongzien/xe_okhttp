@@ -142,7 +142,7 @@ public class HttpPerformer extends BasicOkPerformer {
     private OkHttpClient checkHttpClient(HttpCommand command) {
         OkHttpClient client = null;
         if (command.getDownloadPerformer() != null) {
-            client = command.getDownloadPerformer().buildUpOrDownHttpClient(command.getInfo());
+            client = command.getDownloadPerformer().getOkHttpClient();
         }
         client = client == null ? getOkHttpClient() : client;
         return client;

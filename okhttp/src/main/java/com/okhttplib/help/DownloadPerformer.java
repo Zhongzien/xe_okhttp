@@ -25,15 +25,19 @@ import okhttp3.Response;
 
 public class DownloadPerformer extends BasicOkPerformer {
 
-    private OkHttpClient.Builder okBuilder;
-    private String defaultDirPaht;
+    private String defaultDirPath;
 
     private static ConcurrentHashMap<String, DownloadFileInfo> downloadMap;
 
     DownloadPerformer(Configuration config) {
         super(config);
-        okBuilder = newOkHttpClientBuilder(config);
-        defaultDirPaht = config.getSaveDirPath();
+        defaultDirPath = config.getSaveDirPath();
+    }
+
+    @Override
+    protected OkHttpClient buildOkHttpClient(Configuration config) {
+        OkHttpClient httpClient = newOkHttpClientBuilder(config).build();
+        return httpClient;
     }
 
     public void doRequestAsync(HttpCommand command) {
@@ -48,6 +52,8 @@ public class DownloadPerformer extends BasicOkPerformer {
             return;
         }
         downloadMap.put(fileInfo.getSaveSignaturFileName(), fileInfo);
+
+        getOkHttpClient().interceptors().add(new DownloadInterceptor(fileInfo));
 
         fileInfo.setCompleteSize(completeSize);
         info.addHead("RANGE", "bytes=" + completeSize + "-");
@@ -151,7 +157,7 @@ public class DownloadPerformer extends BasicOkPerformer {
             }
         }
 
-        String simpleDir = TextUtils.isEmpty(info.getSaveDir()) ? defaultDirPaht : info.getSaveDir();
+        String simpleDir = TextUtils.isEmpty(info.getSaveDir()) ? defaultDirPath : info.getSaveDir();
         if (mkdirs(simpleDir)) {
             info.setSaveDir(simpleDir);
         }
@@ -182,10 +188,6 @@ public class DownloadPerformer extends BasicOkPerformer {
     private String buildStamp() {
         int random = (int) (Math.random() * 1000);
         return System.currentTimeMillis() + "_" + random;
-    }
-
-    public OkHttpClient buildUpOrDownHttpClient(HttpInfo info) {
-        return okBuilder.addInterceptor(new DownloadInterceptor(info.getDownloadFile())).build();
     }
 
     static void updateDownloadStatus(String key, @DownloadStatus int status) {

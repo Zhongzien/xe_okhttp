@@ -10,6 +10,7 @@ import com.okhttplib.interceptor.ParamsInterceptor;
 
 import java.util.List;
 
+import okhttp3.Call;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -121,5 +122,7 @@ public abstract class BasicPerformer {
     protected void doRequestSync(HttpCommand command) {
     }
 
-    ;
+    protected HttpInfo downloadInfo(HttpInfo info, Response response, Call call) {
+        return null;
+    }
 }

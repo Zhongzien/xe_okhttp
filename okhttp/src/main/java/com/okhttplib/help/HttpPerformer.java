@@ -2,14 +2,17 @@ package com.okhttplib.help;
 
 import android.os.Message;
 import android.os.NetworkOnMainThreadException;
+import android.text.TextUtils;
 
 import com.okhttplib.HttpInfo;
 import com.okhttplib.annotation.RequestMethod;
 import com.okhttplib.bean.RequestMessage;
+import com.okhttplib.bean.UploadFileInfo;
 import com.okhttplib.callback.OnResultCallBack;
 import com.okhttplib.config.Configuration;
 import com.okhttplib.handler.HttpMainHandler;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.HashMap;
@@ -17,8 +20,11 @@ import java.util.HashMap;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 /**
@@ -53,7 +59,7 @@ public class HttpPerformer extends BasicOkPerformer {
             sendMessage(info, callBack);
             return;
         }
-        Call call = checkHttpClient(command).newCall(checkRequest(command));
+        Call call = checkHttpClient(command).newCall(buildRequest(info, command.getRequestMethod()));
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -79,7 +85,7 @@ public class HttpPerformer extends BasicOkPerformer {
             return;
         }
         try {
-            Call call = checkHttpClient(command).newCall(checkRequest(command));
+            Call call = checkHttpClient(command).newCall(buildRequest(info, command.getRequestMethod()));
             Response response = call.execute();
             doResponse(command, response);
         } catch (SocketTimeoutException e) {
@@ -113,19 +119,19 @@ public class HttpPerformer extends BasicOkPerformer {
         }
     }
 
-    /**
-     * 检验 request，判读使用默认 request 还是重定义 request
-     *
-     * @param command
-     * @return
-     */
-    private Request checkRequest(HttpCommand command) {
-        Request request = null;
-        if (command.getUploadPerformer() != null) {
-            request = command.getUploadPerformer().buildFileRequest(command.getInfo());
-        }
-        return request == null ? buildRequest(command.getInfo(), command.getRequestMethod()) : request;
-    }
+//    /**
+//     * 检验 request，判读使用默认 request 还是重定义 request
+//     *
+//     * @param command
+//     * @return
+//     */
+//    private Request checkRequest(HttpCommand command) {
+//        Request request = null;
+//        if (command.getUploadPerformer() != null) {
+//            request = command.getUploadPerformer().buildFileRequest(command.getInfo());
+//        }
+//        return request == null ? buildRequest(command.getInfo(), command.getRequestMethod()) : request;
+//    }
 
     /**
      * 检验 OkHttpClient，判读使用默认 OkHttpClient 还是重定义 OkHttpClient
@@ -187,6 +193,31 @@ public class HttpPerformer extends BasicOkPerformer {
                     }
                 }
                 builder.url(urlIntegral.toString()).get();
+                break;
+            case RequestMethod.FORM:
+                MultipartBody.Builder mbBuilder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+                if (params != null && !params.isEmpty()) {
+                    for (String key : info.getParams().keySet()) {
+                        String value = info.getParams().get(key);
+                        value = value == null ? "" : value;
+                        mbBuilder.addFormDataPart(key, value);
+                    }
+                }
+                //配置上传文件(需要上传的实体)
+                if (info.getUploadFiles() != null) {
+                    for (UploadFileInfo fileInfo : info.getUploadFiles()) {
+                        String filePath = fileInfo.getFileAbsolutePath();
+                        File file = new File(filePath);
+
+                        if (TextUtils.isEmpty(filePath))
+                            throw new IllegalArgumentException("file path is illegal argument");
+
+                        mbBuilder.addFormDataPart(fileInfo.getUploadFormat(),
+                                file.getName(),
+                                RequestBody.create(MediaType.parse(mediaTypeInterceptor.intercept(filePath)), file));
+                    }
+                }
+                builder.url(info.getUrl()).post(mbBuilder.build());
                 break;
             default:
                 builder.url(info.getUrl()).get();

@@ -76,6 +76,7 @@ public class OkHttpInvoker implements OkHttpInter {
                 setInvokerBuilder(buildHttpInfo().
                         addUploadFiles(mBuilder.uploadFiles)).
                 setOnResultCallBack(callBack).
+                setRequestMethod(RequestMethod.FORM).
                 build().doFileUploadAsync();
     }
 

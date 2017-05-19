@@ -74,7 +74,4 @@ public class UploadPerformer extends BasicOkPerformer  {
         return builder.build();
     }
 
-    public Request buildFileRequest(HttpInfo info) {
-        return buildRequest(info);
-    }
 }

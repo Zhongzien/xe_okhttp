@@ -51,6 +51,7 @@ public class HttpPerformer extends BasicPerformer {
         return config.getOkHttpClient();
     }
 
+    @Override
     public void doRequestAsync(final HttpCommand command) {
         final OnResultCallBack callBack = command.getCallBack();
         final HttpInfo info = command.getInfo();
@@ -76,6 +77,7 @@ public class HttpPerformer extends BasicPerformer {
         });
     }
 
+    @Override
     public void doRequestSync(HttpCommand command) {
         final OnResultCallBack callBack = command.getCallBack();
         final HttpInfo info = command.getInfo();

@@ -26,6 +26,7 @@ public class UploadPerformer extends BasicPerformer {
         super(config);
     }
 
+    @Override
     public void doRequestAsync(HttpCommand command) {
         command.doRequestAsync();
     }

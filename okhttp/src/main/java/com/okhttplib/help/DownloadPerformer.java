@@ -40,6 +40,7 @@ public class DownloadPerformer extends BasicPerformer {
         return httpClient;
     }
 
+    @Override
     public void doRequestAsync(HttpCommand command) {
         final HttpInfo info = command.getInfo();
         final DownloadFileInfo fileInfo = info.getDownloadFile();
@@ -64,7 +65,8 @@ public class DownloadPerformer extends BasicPerformer {
         command.doRequestAsync();
     }
 
-    public HttpInfo downloadInfo(HttpInfo info, Response response, Call call) {
+    @Override
+    protected HttpInfo downloadInfo(HttpInfo info, Response response, Call call) {
         InputStream input = null;
         BufferedInputStream buffInput = null;
         RandomAccessFile accessFile = null;

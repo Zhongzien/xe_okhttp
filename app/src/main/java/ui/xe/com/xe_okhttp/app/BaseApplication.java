@@ -17,7 +17,6 @@ public class BaseApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        Configuration config = new Configuration.Builder().addParamsInterceptor(new MyInterceptor()).build();
-        OkHttpInvoker.config(config);
+        new Configuration.Builder().addParamsInterceptor(new MyInterceptor()).bindConfig();
     }
 }

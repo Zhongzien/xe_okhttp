@@ -2,6 +2,7 @@ package com.okhttplib;
 
 import android.text.TextUtils;
 
+import com.okhttplib.bean.DownloadFileInfo;
 import com.okhttplib.bean.UploadFileInfo;
 
 import java.util.ArrayList;
@@ -14,7 +15,11 @@ import java.util.List;
 
 public class HttpInfo {
 
-    public HttpInfo() {
+    private HttpInfo() {
+    }
+
+    public static HttpInfo getInstance() {
+        return new HttpInfo();
     }
 
     //普通请求
@@ -22,46 +27,32 @@ public class HttpInfo {
     private String url;
     private HashMap<String, String> heads;
 
-    public HashMap<String, String> getHeads() {
-        return heads;
+    public HttpInfo addHeads(HashMap<String, String> heads) {
+        this.heads = heads;
+        return this;
     }
 
-    public void addHeads(HashMap<String, String> heads) {
-        if (heads != null) {
-            if (this.heads == null)
-                this.heads = new HashMap<>();
-            this.heads.putAll(heads);
-        }
-    }
-
-    public void addHead(String key, String value) {
-        if (!TextUtils.isEmpty(key)) {
-            if (heads == null)
-                heads = new HashMap<>();
-            value = value == null ? "" : value;
+    public HttpInfo addHead(String key, String value) {
+        if (key != null) {
+            if (heads == null) heads = new HashMap<>();
             heads.put(key, value);
         }
+
+        return this;
     }
 
-    public void addParams(HashMap<String, String> params) {
-        if (params != null) {
-            if (this.params == null)
-                this.params = new HashMap<>();
-            this.params.putAll(params);
-        }
+    public HttpInfo addParams(HashMap<String, String> params) {
+        this.params = params;
+        return this;
     }
 
-    public void addParam(String key, String value) {
-        if (!TextUtils.isEmpty(key)) {
-            if (params == null)
-                params = new HashMap<>();
-            value = value == null ? "" : value;
-            params.put(key, value);
-        }
-    }
-
-    public void setUrl(String url) {
+    public HttpInfo addUrl(String url) {
         this.url = url;
+        return this;
+    }
+
+    public HashMap<String, String> getHeads() {
+        return heads;
     }
 
     public HashMap<String, String> getParams() {
@@ -79,24 +70,28 @@ public class HttpInfo {
         return uploadFiles;
     }
 
-    public void setUploadFiles(List<UploadFileInfo> files) {
-        if (uploadFiles == null) {
-            uploadFiles = files;
-        } else {
-            uploadFiles.addAll(files);
-        }
+    public HttpInfo addUploadFiles(List<UploadFileInfo> files) {
+        uploadFiles = files;
+        return this;
     }
 
-    public void setUploadFiles(String uploadFormat, String fileAbsolutePath) {
-        if (uploadFiles == null) uploadFiles = new ArrayList<>();
+    //文件下载
 
-        if (!TextUtils.isEmpty(fileAbsolutePath))
-            uploadFiles.add(new UploadFileInfo(uploadFormat, fileAbsolutePath));
+    private DownloadFileInfo downloadFile;
+
+    public DownloadFileInfo getDownloadFile() {
+        return downloadFile;
+    }
+
+    public HttpInfo addDownloadFile(DownloadFileInfo info) {
+        downloadFile = info;
+        return this;
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     //*****本地状态码*****/
+    //基础信息
     public final static int NET_SUCCESS = 0x00;
     public final static int NET_FAILURE = 0x01;
     public final static int CHECK_URL = 0x02;
@@ -106,6 +101,12 @@ public class HttpInfo {
     public final static int CONNECTION_TIME_OUT = 0x06;
     public final static int READ_OR_WRITE_TIME_OUT = 0x07;
     public final static int ON_RESULT = 0x08;
+    public final static int CONNECTION_INTERRUPTION = 0x09;
+
+    //下载信息
+    public final static int DOWNLOAD_PAUSE = 0x10;
+    public final static int DOWNLOAD_STOP = 0x11;
+    public final static int DOWNLOAD_COMPLETE = 0x12;
 
     //返回参数
     private String msg;
@@ -144,6 +145,18 @@ public class HttpInfo {
                 break;
             case ON_RESULT:
                 msg = "没有获取到数据";
+                break;
+            case CONNECTION_INTERRUPTION:
+                msg = "连接中断";
+                break;
+            case DOWNLOAD_PAUSE:
+                msg = "暂停下载";
+                break;
+            case DOWNLOAD_STOP:
+                msg = "停止下载";
+                break;
+            case DOWNLOAD_COMPLETE:
+                msg = "完成下载";
                 break;
         }
         resultBody = body == null ? "" : body;

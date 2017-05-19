@@ -2,16 +2,13 @@ package com.okhttplib.help;
 
 import android.os.Message;
 import android.os.NetworkOnMainThreadException;
-import android.util.Log;
 
 import com.okhttplib.HttpInfo;
 import com.okhttplib.annotation.RequestMethod;
-import com.okhttplib.help.inter.NetWorkInter;
-import com.okhttplib.help.inter.RequestBuildInter;
-import com.okhttplib.config.Configuration;
-import com.okhttplib.bean.OkRequestMessage;
+import com.okhttplib.bean.RequestMessage;
 import com.okhttplib.callback.OnResultCallBack;
-import com.okhttplib.handler.OkHttpMainHandler;
+import com.okhttplib.config.Configuration;
+import com.okhttplib.handler.HttpMainHandler;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
@@ -20,69 +17,71 @@ import java.util.HashMap;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 /**
- * 网络请求执行者
- * 负责普通的网络请求访问：get/post
+ * 网络请求执行者（网络请求的真正执行者）
+ * 负责网络请求访问
  * 分别提供同步和异步请求
  */
 
-public class OkHttpPerformer extends BasicOkPerformer implements NetWorkInter {
+public class HttpPerformer extends BasicOkPerformer {
 
-    OkHttpPerformer(Configuration config) {
+    HttpPerformer(Configuration config) {
         super(config);
     }
 
     @Override
-    public void doRequestAsync(OKHttpCommand command) {
+    protected OkHttpClient buildOkHttpClient(Configuration config) {
+        if (config.getOkHttpClient() == null) {
+            synchronized (config) {
+                if (config.getOkHttpClient() == null) {
+                    config.setOkHttpClient(newOkHttpClientBuilder(config).build());
+                }
+            }
+        }
+        return config.getOkHttpClient();
+    }
+
+    public void doRequestAsync(final HttpCommand command) {
         final OnResultCallBack callBack = command.getCallBack();
-        if (callBack == null)
-            throw new NullPointerException("OnResultCallBack can not null!");
         final HttpInfo info = command.getInfo();
         if (!checkUrl(info.getUrl())) {
-            Message msg = new OkRequestMessage(OkHttpMainHandler.RESPONSE_HTTP,
-                    updateInfo(info, HttpInfo.CHECK_URL),
-                    callBack).build();
-            OkHttpMainHandler.getInstance().sendMessage(msg);
+            updateInfo(info, HttpInfo.CHECK_URL);
+            sendMessage(info, callBack);
             return;
         }
-        Call call = getOkHttpClient().newCall(checkRequest(command));
+        Call call = checkHttpClient(command).newCall(checkRequest(command));
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Message msg = new OkRequestMessage(OkHttpMainHandler.RESPONSE_HTTP,
-                        updateInfo(info, HttpInfo.NET_FAILURE, e.getMessage()),
-                        callBack).build();
-                OkHttpMainHandler.getInstance().sendMessage(msg);
+                updateInfo(info, HttpInfo.NET_FAILURE, e.getMessage());
+                sendMessage(info, callBack);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                Message msg = new OkRequestMessage(OkHttpMainHandler.RESPONSE_HTTP,
-                        doResponse(info, response),
-                        callBack).build();
-                OkHttpMainHandler.getInstance().sendMessage(msg);
+                doResponse(command, response);
+                sendMessage(info, callBack);
                 if (!call.isCanceled()) call.cancel();
             }
         });
     }
 
-    @Override
-    public void doRequestSync(OKHttpCommand command) {
+    public void doRequestSync(HttpCommand command) {
         final OnResultCallBack callBack = command.getCallBack();
-        if (callBack == null)
-            throw new NullPointerException("OnResultCallBack can not null!");
         final HttpInfo info = command.getInfo();
         if (!checkUrl(info.getUrl())) {
-            callBack.onResponse(updateInfo(info, HttpInfo.CHECK_URL));
+            if (callBack != null)
+                callBack.onResponse(updateInfo(info, HttpInfo.CHECK_URL));
             return;
         }
         try {
-            Call call = getOkHttpClient().newCall(checkRequest(command));
+            Call call = checkHttpClient(command).newCall(checkRequest(command));
             Response response = call.execute();
-            doResponse(info, response);
+            doResponse(command, response);
         } catch (SocketTimeoutException e) {
             if (null != e.getMessage()) {
                 if (e.getMessage().contains("failed to connect to"))
@@ -96,19 +95,60 @@ public class OkHttpPerformer extends BasicOkPerformer implements NetWorkInter {
         } catch (Exception e) {
             updateInfo(info, HttpInfo.ON_RESULT);
         } finally {
-            callBack.onResponse(info);
+            if (callBack != null)
+                callBack.onResponse(info);
         }
     }
 
-    private Request checkRequest(OKHttpCommand command) {
-        RequestBuildInter observer = command.getFileObserver();
+    /**
+     * 發送消息，確保異步訪問返回的消息可以在主綫程中更新
+     *
+     * @param info
+     * @param callBack
+     */
+    private void sendMessage(HttpInfo info, OnResultCallBack callBack) {
+        if (callBack != null) {
+            Message msg = new RequestMessage(HttpMainHandler.RESPONSE_HTTP, info, callBack).build();
+            HttpMainHandler.getInstance().sendMessage(msg);
+        }
+    }
+
+    /**
+     * 检验 request，判读使用默认 request 还是重定义 request
+     *
+     * @param command
+     * @return
+     */
+    private Request checkRequest(HttpCommand command) {
         Request request = null;
-        if (observer != null) {
-            request = observer.buildFileRequest(command.getInfo());
+        if (command.getUploadPerformer() != null) {
+            request = command.getUploadPerformer().buildFileRequest(command.getInfo());
         }
         return request == null ? buildRequest(command.getInfo(), command.getRequestMethod()) : request;
     }
 
+    /**
+     * 检验 OkHttpClient，判读使用默认 OkHttpClient 还是重定义 OkHttpClient
+     *
+     * @param command
+     * @return
+     */
+    private OkHttpClient checkHttpClient(HttpCommand command) {
+        OkHttpClient client = null;
+        if (command.getDownloadPerformer() != null) {
+            client = command.getDownloadPerformer().buildUpOrDownHttpClient(command.getInfo());
+        }
+        client = client == null ? getOkHttpClient() : client;
+        return client;
+    }
+
+    /**
+     * 构建 默认的request
+     *
+     * @param info
+     * @param method
+     * @return
+     */
     private Request buildRequest(HttpInfo info, @RequestMethod int method) {
         Request.Builder builder = new Request.Builder();
         HashMap<String, String> params = info.getParams();
@@ -127,7 +167,6 @@ public class OkHttpPerformer extends BasicOkPerformer implements NetWorkInter {
                     }
                 }
                 builder.url(info.getUrl()).post(fBuilder.build());
-                Log.i("OkHttp", "POST");
                 break;
             case RequestMethod.GET:
                 StringBuilder urlIntegral = new StringBuilder();
@@ -148,11 +187,9 @@ public class OkHttpPerformer extends BasicOkPerformer implements NetWorkInter {
                     }
                 }
                 builder.url(urlIntegral.toString()).get();
-                Log.i("OkHttp", "GET");
                 break;
             default:
                 builder.url(info.getUrl()).get();
-                Log.i("OkHttp", "default");
                 break;
         }
         //配置http head

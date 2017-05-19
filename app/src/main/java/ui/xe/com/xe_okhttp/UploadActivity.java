@@ -92,7 +92,7 @@ public class UploadActivity extends AppCompatActivity implements View.OnClickLis
         new Thread(new Runnable() {
             @Override
             public void run() {
-                OkHttpInvoker.getDefaultBuilder().
+                OkHttpInvoker.getBuilder().
                         addUploadFile("file2", filePathTwo).
                         setUrl(url).build().
                         doUploadSync(new OnResultCallBack() {
@@ -110,7 +110,7 @@ public class UploadActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void uploadImgMulti() {
-        OkHttpInvoker.getDefaultBuilder().
+        OkHttpInvoker.getBuilder().
                 setUrl(url).addUploadFile("file1", filePathOne).
                 addUploadFile("file2", filePathTwo).
                 build().doUploadAsync(new OnResultCallBack() {
@@ -126,7 +126,7 @@ public class UploadActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void uploadImgOne() {
-        OkHttpInvoker.getDefaultBuilder().
+        OkHttpInvoker.getBuilder().
                 setUrl(url).addUploadFile("file", filePathOne).
                 build().doUploadAsync(new OnResultCallBack() {
             @Override

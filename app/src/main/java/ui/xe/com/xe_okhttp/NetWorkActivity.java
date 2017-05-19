@@ -31,7 +31,7 @@ public class NetWorkActivity extends AppCompatActivity {
         map.put("username", "iyihua");
         map.put("password", "123456");
 
-        OkHttpInvoker.getDefaultBuilder().setUrl("http://192.168.1.128:8091/login").addParams(map).build().doPostAsync(new OnResultCallBack() {
+        OkHttpInvoker.getBuilder().setUrl("http://192.168.1.128:8091/login").addParams(map).build().doPostAsync(new OnResultCallBack() {
             @Override
             public void onResponse(HttpInfo info) {
                 if (info.isSuccess()) {
@@ -44,7 +44,7 @@ public class NetWorkActivity extends AppCompatActivity {
     }
 
     public void doGetAsync(View v) {
-        OkHttpInvoker.getDefaultBuilder().setUrl("http://192.168.1.128:8091/post/list").
+        OkHttpInvoker.getBuilder().setUrl("http://192.168.1.128:8091/post/list").
                 addParam("cid", "1").build().doGetAsync(new OnResultCallBack() {
 
             @Override
@@ -62,7 +62,7 @@ public class NetWorkActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                OkHttpInvoker.getDefaultBuilder().setUrl("http://192.168.1.128:8091/login").
+                OkHttpInvoker.getBuilder().setUrl("http://192.168.1.128:8091/login").
                         addParam("username", "iyihua").
                         addParam("password", "123456").build().
                         doPostSync(new OnResultCallBack() {
@@ -83,7 +83,7 @@ public class NetWorkActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                OkHttpInvoker.getDefaultBuilder().setUrl("http://192.168.1.128:8091/post/list?cid=1").build().
+                OkHttpInvoker.getBuilder().setUrl("http://192.168.1.128:8091/post/list?cid=1").build().
                         doGetSync(new OnResultCallBack() {
                             @Override
                             public void onResponse(HttpInfo info) {

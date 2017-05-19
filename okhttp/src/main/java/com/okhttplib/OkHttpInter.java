@@ -41,11 +41,5 @@ public interface OkHttpInter {
      */
     void doUploadAsync(OnResultCallBack callBack);
 
-    /**
-     * 同步上传文件
-     *
-     * @return
-     */
-    void doUploadSync(OnResultCallBack callBack);
-
+    void doDownloadAsync();
 }

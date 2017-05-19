@@ -1,18 +1,16 @@
 package com.okhttplib.help;
 
 import com.okhttplib.HttpInfo;
+import com.okhttplib.annotation.DownloadStatus;
 import com.okhttplib.annotation.RequestMethod;
-import com.okhttplib.help.inter.NetWorkInter;
-import com.okhttplib.help.inter.RequestBuildInter;
-import com.okhttplib.config.Configuration;
 import com.okhttplib.callback.OnResultCallBack;
-import com.okhttplib.help.inter.UploadInter;
+import com.okhttplib.config.Configuration;
 
 /**
  * 命令角色
  */
 
-public class OKHttpCommand {
+public final class HttpCommand {
 
     private OnResultCallBack callBack;
     /**
@@ -24,18 +22,22 @@ public class OKHttpCommand {
     @RequestMethod
     int requestMethod;
 
-    private NetWorkInter httpPerformer;
+    private HttpPerformer httpPerformer;
 
-    private UploadInter okUploadPerformer;
+    private UploadPerformer uploadPerformer;
+    private DownloadPerformer downLoadPerformer;
 
-    private OKHttpCommand(Builder builder) {
+    private HttpCommand(Builder builder) {
         info = builder.info;
         requestMethod = builder.requestMethod;
         callBack = builder.callBack;
-        httpPerformer = new OkHttpPerformer(builder.config);
+        httpPerformer = new HttpPerformer(builder.config);
 
         if (info.getUploadFiles() != null && !info.getUploadFiles().isEmpty())
-            okUploadPerformer = new OkUploadPerformer(builder.config);
+            uploadPerformer = new UploadPerformer(builder.config);
+
+        if (info.getDownloadFile() != null)
+            downLoadPerformer = new DownloadPerformer(builder.config);
     }
 
     public void doRequestAsync() {
@@ -47,14 +49,19 @@ public class OKHttpCommand {
     }
 
     public void doFileUploadAsync() {
-        okUploadPerformer.doRequestAsync(this);
+        uploadPerformer.doRequestAsync(this);
     }
 
+    @Deprecated
     public void doFileUploadSync() {
-        okUploadPerformer.doRequestSync(this);
+        uploadPerformer.doRequestSync(this);
     }
 
-    public static Builder getCommandBuilder() {
+    public void doDownloadAsync() {
+        downLoadPerformer.doRequestAsync(this);
+    }
+
+    public static Builder getBuilder() {
         return new Builder();
     }
 
@@ -90,8 +97,8 @@ public class OKHttpCommand {
             return this;
         }
 
-        public OKHttpCommand build() {
-            return new OKHttpCommand(this);
+        public HttpCommand build() {
+            return new HttpCommand(this);
         }
 
     }
@@ -100,17 +107,29 @@ public class OKHttpCommand {
         return callBack;
     }
 
+    void setCallBack(OnResultCallBack callBack) {
+        this.callBack = callBack;
+    }
+
     public HttpInfo getInfo() {
         return info;
     }
 
-    public RequestBuildInter getFileObserver() {
-        return okUploadPerformer;
+    public UploadPerformer getUploadPerformer() {
+        return uploadPerformer;
+    }
+
+    public DownloadPerformer getDownloadPerformer() {
+        return downLoadPerformer;
     }
 
     public
     @RequestMethod
     int getRequestMethod() {
         return requestMethod;
+    }
+
+    public static void updateDownloadStatus(String key, @DownloadStatus int status) {
+        DownloadPerformer.updateDownloadStatus(key, status);
     }
 }

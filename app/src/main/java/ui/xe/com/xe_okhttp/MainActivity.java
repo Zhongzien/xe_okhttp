@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void doPostSync(View v) {
-
+        startActivity(new Intent(this, DownLoadActivity.class));
     }
 
     public void doGetSync(View v) {

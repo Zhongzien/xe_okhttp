@@ -19,9 +19,9 @@ import okhttp3.Response;
  * 命令执行者基类
  */
 
-public class BasicOkPerformer {
+public abstract class BasicOkPerformer {
 
-    private static OkHttpClient mHttpClient;
+    private OkHttpClient mHttpClient;
 
     protected final List<MsgInterceptor> okHttpInterceptors;
     protected final ParamsInterceptor paramsInterceptor;
@@ -31,27 +31,20 @@ public class BasicOkPerformer {
         okHttpInterceptors = config.getMsgInterceptor();
         paramsInterceptor = config.getParamsInterceptor();
         mediaTypeInterceptor = config.getMediaTypeInterceptor();
-        newOkHttpClient(config);
+
+        mHttpClient = buildOkHttpClient(config);
     }
 
-    private OkHttpClient newOkHttpClient(Configuration config) {
-        if (mHttpClient == null) {
-            synchronized (BasicOkPerformer.class) {
-                if (mHttpClient == null)
-                    mHttpClient = newOkHttpClientBuilder(config).build();
-            }
-        }
-        return mHttpClient;
+    protected OkHttpClient buildOkHttpClient(Configuration config) {
+        return null;
     }
 
-    private OkHttpClient.Builder newOkHttpClientBuilder(Configuration config) {
+    protected OkHttpClient.Builder newOkHttpClientBuilder(Configuration config) {
         OkHttpClient.Builder builder = new OkHttpClient.Builder().
                 connectTimeout(config.getConnectTimeOut(), config.getTimeUnit()).
                 readTimeout(config.getReadTimeOut(), config.getTimeUnit()).
                 writeTimeout(config.getWriteTimeOut(), config.getTimeUnit());
-//        if (config.getCacheFile() != null) {
-//            builder.cache(new Cache(config.getCacheFile(), config.getCacheMaxSize()));
-//        }
+
         return builder;
     }
 
@@ -72,17 +65,21 @@ public class BasicOkPerformer {
         }
     }
 
-    protected HttpInfo doResponse(HttpInfo info, Response res) {
+    protected HttpInfo doResponse(HttpCommand command, Response res) {
+        final HttpInfo info = command.getInfo();
         try {
             if (res != null) {
-                String body = res.body().string();
                 if (res.isSuccessful()) {
-                    return updateInfo(info, res.code(), HttpInfo.NET_SUCCESS, body);
+                    if (command.getDownloadPerformer() != null) {
+                        return command.getDownloadPerformer().downloadInfo(info, res, null);
+                    } else {
+                        return updateInfo(info, res.code(), HttpInfo.NET_SUCCESS, res.body().string());
+                    }
                 } else {
                     if (res.code() >= 400 && res.code() < 500) {
-                        return updateInfo(info, res.code(), HttpInfo.CLIENT_4XX, body);
+                        return updateInfo(info, res.code(), HttpInfo.CLIENT_4XX, res.body().string());
                     } else if (res.code() >= 500 && res.code() < 600) {
-                        return updateInfo(info, res.code(), HttpInfo.SERVICE_5XX, body);
+                        return updateInfo(info, res.code(), HttpInfo.SERVICE_5XX, res.body().string());
                     }
                 }
             }

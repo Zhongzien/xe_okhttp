@@ -1,5 +1,6 @@
 package com.okhttplib.config;
 
+import com.okhttplib.OkHttpInvoker;
 import com.okhttplib.interceptor.MediaTypeInterceptor;
 import com.okhttplib.interceptor.MsgInterceptor;
 import com.okhttplib.interceptor.ParamsInterceptor;
@@ -10,31 +11,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
 
 /**
  * 全局配置文件
  */
 
-public final class Configuration implements Cloneable {
+public final class Configuration {
 
     private final static int DEFAULT_TIME_OUT = 15;
 
     private Builder mBuilder;
+    private static OkHttpClient mHttpClient;
 
     private Configuration() {
-    }
-
-    @Override
-    public Configuration clone() {
-        try {
-            Configuration config = (Configuration) super.clone();
-            config.mBuilder = mBuilder.clone();
-            return config;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
     }
 
     private Configuration(Builder builder) {
@@ -45,7 +35,7 @@ public final class Configuration implements Cloneable {
         return new Configuration.Builder();
     }
 
-    public final static class Builder implements Cloneable {
+    public final static class Builder {
         private long connectTimeOut;
         private long readTimeOut;
         private long writeTimeOut;
@@ -53,6 +43,8 @@ public final class Configuration implements Cloneable {
 
         private File cacheFile;
         private long cacheMaxSize;
+
+        private String saveDirPaht;
 
         private List<MsgInterceptor> okHttpInterceptors;
         private ParamsInterceptor paramsInterceptor;
@@ -62,26 +54,17 @@ public final class Configuration implements Cloneable {
             initDefaultConfig();
         }
 
-        @Override
-        public Builder clone() {
-            try {
-                Builder builder = (Builder) super.clone();
-                builder.connectTimeOut = connectTimeOut;
-                builder.readTimeOut = readTimeOut;
-                builder.timeUnit = timeUnit;
-                return builder;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
+        private void initDefaultConfig() {
+            addConnectTimeOut(DEFAULT_TIME_OUT);
+            addReadTimeOut(DEFAULT_TIME_OUT);
+            addWriteTimeOut(DEFAULT_TIME_OUT);
+            addTimeUnit(TimeUnit.SECONDS);
+            mediaTypeInterceptor = new DefaultUploadInterceptor();
         }
 
-        private void initDefaultConfig() {
-            setConnectTimeOut(DEFAULT_TIME_OUT);
-            setReadTimeOut(DEFAULT_TIME_OUT);
-            setWriteTimeOut(DEFAULT_TIME_OUT);
-            setTimeUnit(TimeUnit.SECONDS);
-            mediaTypeInterceptor = new DefaultUploadInterceptor();
+        public Builder addSaveDirPath(String dir) {
+            saveDirPaht = dir;
+            return this;
         }
 
         public Builder addMadiaTypeInterceptor(MediaTypeInterceptor interceptor) {
@@ -90,7 +73,7 @@ public final class Configuration implements Cloneable {
             return this;
         }
 
-        public Builder setCacheFile(File file) {
+        public Builder addCacheFile(File file) {
             if (file != null) {
                 cacheFile = file;
                 if (cacheMaxSize <= 0)
@@ -99,35 +82,35 @@ public final class Configuration implements Cloneable {
             return this;
         }
 
-        public Builder setCacheSize(long size) {
+        public Builder addCacheSize(long size) {
             if (size > 0) {
                 cacheMaxSize = size;
             }
             return this;
         }
 
-        public Builder setConnectTimeOut(long connectTimeOut) {
+        public Builder addConnectTimeOut(long connectTimeOut) {
             if (connectTimeOut <= 0)
                 throw new IllegalArgumentException("connectTimeOut can not less than zero");
             this.connectTimeOut = connectTimeOut;
             return this;
         }
 
-        public Builder setReadTimeOut(long readTimeOut) {
+        public Builder addReadTimeOut(long readTimeOut) {
             if (readTimeOut <= 0)
                 throw new IllegalArgumentException("readTimeOut can not less than zero");
             this.readTimeOut = readTimeOut;
             return this;
         }
 
-        public Builder setWriteTimeOut(long writeTimeOut) {
+        public Builder addWriteTimeOut(long writeTimeOut) {
             if (readTimeOut <= 0)
                 throw new IllegalArgumentException("writeTimeOut can not less than zero");
             this.writeTimeOut = writeTimeOut;
             return this;
         }
 
-        public Builder setTimeUnit(TimeUnit timeUnit) {
+        public Builder addTimeUnit(TimeUnit timeUnit) {
             this.timeUnit = timeUnit;
             return this;
         }
@@ -147,8 +130,8 @@ public final class Configuration implements Cloneable {
             return this;
         }
 
-        public Configuration build() {
-            return new Configuration(this);
+        public void bindConfig() {
+            OkHttpInvoker.config(new Configuration(this));
         }
 
     }
@@ -187,5 +170,17 @@ public final class Configuration implements Cloneable {
 
     public MediaTypeInterceptor getMediaTypeInterceptor() {
         return mBuilder.mediaTypeInterceptor;
+    }
+
+    public void setOkHttpClient(OkHttpClient client) {
+        mHttpClient = client;
+    }
+
+    public OkHttpClient getOkHttpClient() {
+        return mHttpClient;
+    }
+
+    public String getSaveDirPath() {
+        return mBuilder.saveDirPaht;
     }
 }

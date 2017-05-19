@@ -1,15 +1,19 @@
 package com.okhttplib;
 
+import android.text.TextUtils;
+
+import com.okhttplib.annotation.DownloadStatus;
 import com.okhttplib.annotation.RequestMethod;
+import com.okhttplib.bean.DownloadFileInfo;
 import com.okhttplib.bean.UploadFileInfo;
+import com.okhttplib.callback.OnProgressCallBack;
 import com.okhttplib.config.Configuration;
 import com.okhttplib.callback.OnResultCallBack;
-import com.okhttplib.help.OKHttpCommand;
+import com.okhttplib.help.HttpCommand;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import okhttp3.OkHttpClient;
 
 /**
  * 命令请求者角色
@@ -21,19 +25,15 @@ public class OkHttpInvoker implements OkHttpInter {
 
     private Builder mBuilder;
 
-    static {
-        config(new Configuration.Builder().build());
-    }
-
     private OkHttpInvoker(Builder builder) {
         mBuilder = builder;
     }
 
     @Override
     public void doPostAsync(final OnResultCallBack callBack) {
-        OKHttpCommand.getCommandBuilder().
-                setConfiguration(mConfig).
-                setInvokerBuilder(mBuilder.info).
+        HttpCommand.getBuilder().
+                setConfiguration(buildConfig()).
+                setInvokerBuilder(buildHttpInfo()).
                 setOnResultCallBack(callBack).
                 setRequestMethod(RequestMethod.POST).
                 build().doRequestAsync();
@@ -41,9 +41,9 @@ public class OkHttpInvoker implements OkHttpInter {
 
     @Override
     public void doGetAsync(final OnResultCallBack callBack) {
-        OKHttpCommand.getCommandBuilder().
-                setConfiguration(mConfig).
-                setInvokerBuilder(mBuilder.info).
+        HttpCommand.getBuilder().
+                setConfiguration(buildConfig()).
+                setInvokerBuilder(buildHttpInfo()).
                 setOnResultCallBack(callBack).
                 setRequestMethod(RequestMethod.GET).
                 build().doRequestAsync();
@@ -51,9 +51,9 @@ public class OkHttpInvoker implements OkHttpInter {
 
     @Override
     public void doPostSync(OnResultCallBack callBack) {
-        OKHttpCommand.getCommandBuilder().
-                setConfiguration(mConfig).
-                setInvokerBuilder(mBuilder.info).
+        HttpCommand.getBuilder().
+                setConfiguration(buildConfig()).
+                setInvokerBuilder(buildHttpInfo()).
                 setOnResultCallBack(callBack).
                 setRequestMethod(RequestMethod.POST).
                 build().doRequestSync();
@@ -61,9 +61,9 @@ public class OkHttpInvoker implements OkHttpInter {
 
     @Override
     public void doGetSync(OnResultCallBack callBack) {
-        OKHttpCommand.getCommandBuilder().
-                setConfiguration(mConfig).
-                setInvokerBuilder(mBuilder.info).
+        HttpCommand.getBuilder().
+                setConfiguration(buildConfig()).
+                setInvokerBuilder(buildHttpInfo()).
                 setOnResultCallBack(callBack).
                 setRequestMethod(RequestMethod.GET).
                 build().doRequestSync();
@@ -71,70 +71,134 @@ public class OkHttpInvoker implements OkHttpInter {
 
     @Override
     public void doUploadAsync(OnResultCallBack callBack) {
-        OKHttpCommand.getCommandBuilder().
-                setConfiguration(mConfig).
-                setInvokerBuilder(mBuilder.info).
+        HttpCommand.getBuilder().
+                setConfiguration(buildConfig()).
+                setInvokerBuilder(buildHttpInfo().
+                        addUploadFiles(mBuilder.uploadFiles)).
                 setOnResultCallBack(callBack).
                 build().doFileUploadAsync();
     }
 
     @Override
-    public void doUploadSync(OnResultCallBack callBack) {
-        OKHttpCommand.getCommandBuilder().
-                setConfiguration(mConfig).
-                setInvokerBuilder(mBuilder.info).
-                setOnResultCallBack(callBack).
-                build().doFileUploadSync();
+    public void doDownloadAsync() {
+        List<DownloadFileInfo> downloadFiles = mBuilder.downloadFiles;
+        if (downloadFiles == null)
+            throw new NullPointerException("the download files list can not null!");
+        for (DownloadFileInfo info : downloadFiles) {
+            HttpCommand.getBuilder().
+                    setConfiguration(buildConfig()).
+                    setInvokerBuilder(buildHttpInfo().
+                            addDownloadFile(info)).
+                    build().doDownloadAsync();
+        }
     }
 
     public static void config(Configuration config) {
-        mConfig = config;
+        if (mConfig == null) {
+            synchronized (OkHttpInvoker.class) {
+                if (mConfig == null)
+                    mConfig = config;
+            }
+        }
     }
 
-    public static Builder getDefaultBuilder() {
+    public static Builder getBuilder() {
         return new Builder();
+    }
+
+    private HttpInfo buildHttpInfo() {
+        HttpInfo info = HttpInfo.getInstance().
+                addUrl(mBuilder.url).
+                addParams(mBuilder.params).
+                addHeads(mBuilder.heads);
+        return info;
     }
 
     public static class Builder {
 
-        private HttpInfo info;
+        ////普通请求
+        private String url;
+        private HashMap<String, String> params;
+        private HashMap<String, String> heads;
+        //文件上传
+        List<UploadFileInfo> uploadFiles;
+        //文件下载
+        private List<DownloadFileInfo> downloadFiles;
 
         public Builder() {
-            info = new HttpInfo();
         }
 
         public Builder setUrl(String url) {
-            info.setUrl(url);
+            this.url = url;
             return this;
         }
 
         public Builder addParams(HashMap<String, String> params) {
-            info.addParams(params);
+            if (params != null) {
+                if (this.params == null) this.params = new HashMap<>();
+                this.params.putAll(params);
+            }
             return this;
         }
 
         public Builder addParam(String key, String value) {
-            info.addParam(key, value);
+            if (!TextUtils.isEmpty(key)) {
+                if (params == null) params = new HashMap<>();
+                params.put(key, value);
+            }
             return this;
         }
 
         public Builder addHeads(HashMap<String, String> heads) {
-            info.addHeads(heads);
+            if (heads != null) {
+                if (this.heads == null) this.heads = new HashMap<>();
+                this.heads.putAll(heads);
+            }
             return this;
         }
 
         public Builder addHead(String key, String value) {
-            info.addHead(key, value);
+            if (!TextUtils.isEmpty(key)) {
+                if (heads == null) heads = new HashMap<>();
+                heads.put(key, value);
+            }
             return this;
         }
 
         public Builder addUploadFiles(List<UploadFileInfo> files) {
-            info.setUploadFiles(files);
+            if (files != null) {
+                if (uploadFiles == null) uploadFiles = new ArrayList<>();
+                uploadFiles.addAll(files);
+            }
             return this;
         }
 
         public Builder addUploadFile(String uploadFormat, String fileAbsolutePath) {
-            info.setUploadFiles(uploadFormat, fileAbsolutePath);
+            if (!TextUtils.isEmpty(fileAbsolutePath)) {
+                if (uploadFiles == null) uploadFiles = new ArrayList<>();
+                uploadFiles.add(new UploadFileInfo(uploadFormat, fileAbsolutePath));
+            }
+            return this;
+        }
+
+        public Builder addDownloadFiles(List<DownloadFileInfo> files) {
+            if (files != null) {
+                if (downloadFiles == null) downloadFiles = new ArrayList<>();
+                downloadFiles.addAll(files);
+            }
+            return this;
+        }
+
+        public Builder addDownloadFile(String url, String saveDir, String saveFileName) {
+            addDownloadFile(url, saveDir, saveFileName, null);
+            return this;
+        }
+
+        public Builder addDownloadFile(String url, String saveDir, String saveFileName, OnProgressCallBack callBack) {
+            if (!TextUtils.isEmpty(url)) {
+                if (downloadFiles == null) downloadFiles = new ArrayList<>();
+                downloadFiles.add(new DownloadFileInfo(url, saveDir, saveFileName, callBack));
+            }
             return this;
         }
 
@@ -144,7 +208,21 @@ public class OkHttpInvoker implements OkHttpInter {
 
     }
 
-    public void test() {
-        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+    private Configuration buildConfig() {
+        if (mConfig == null) {
+            synchronized (OkHttpInvoker.class) {
+                if (mConfig == null)
+                    new Configuration.Builder().bindConfig();
+            }
+        }
+        return mConfig;
+    }
+
+    public static void stop(String key) {
+        HttpCommand.updateDownloadStatus(key, DownloadStatus.STOP);
+    }
+
+    public static void pause(String key) {
+        HttpCommand.updateDownloadStatus(key, DownloadStatus.PAUSE);
     }
 }

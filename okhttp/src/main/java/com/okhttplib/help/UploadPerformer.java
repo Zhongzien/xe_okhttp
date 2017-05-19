@@ -4,9 +4,7 @@ import android.text.TextUtils;
 
 import com.okhttplib.HttpInfo;
 import com.okhttplib.bean.UploadFileInfo;
-import com.okhttplib.help.inter.RequestBuildInter;
 import com.okhttplib.config.Configuration;
-import com.okhttplib.help.inter.UploadInter;
 
 import java.io.File;
 import java.util.HashMap;
@@ -22,19 +20,18 @@ import okhttp3.RequestBody;
  * 分别提供同步和异步请求
  */
 
-public class OkUploadPerformer extends BasicOkPerformer implements UploadInter {
+public class UploadPerformer extends BasicOkPerformer  {
 
-    OkUploadPerformer(Configuration config) {
+    UploadPerformer(Configuration config) {
         super(config);
     }
 
-    @Override
-    public void doRequestAsync(OKHttpCommand command) {
+    public void doRequestAsync(HttpCommand command) {
         command.doRequestAsync();
     }
 
-    @Override
-    public void doRequestSync(OKHttpCommand command) {
+    @Deprecated
+    public void doRequestSync(HttpCommand command) {
         command.doRequestSync();
     }
 
@@ -77,7 +74,6 @@ public class OkUploadPerformer extends BasicOkPerformer implements UploadInter {
         return builder.build();
     }
 
-    @Override
     public Request buildFileRequest(HttpInfo info) {
         return buildRequest(info);
     }

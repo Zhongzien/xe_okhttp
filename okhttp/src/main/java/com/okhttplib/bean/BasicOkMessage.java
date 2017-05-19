@@ -8,7 +8,7 @@ import java.io.Serializable;
  * Created by Administrator on 2017/4/18 0018.
  */
 
-public abstract class BaseOkMessage implements Serializable {
+public abstract class BasicOkMessage implements Serializable {
 
     public int what;
 

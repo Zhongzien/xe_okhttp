@@ -33,7 +33,7 @@ import okhttp3.Response;
  * 分别提供同步和异步请求
  */
 
-public class HttpPerformer extends BasicOkPerformer {
+public class HttpPerformer extends BasicPerformer {
 
     HttpPerformer(Configuration config) {
         super(config);
@@ -141,8 +141,8 @@ public class HttpPerformer extends BasicOkPerformer {
      */
     private OkHttpClient checkHttpClient(HttpCommand command) {
         OkHttpClient client = null;
-        if (command.getDownloadPerformer() != null) {
-            client = command.getDownloadPerformer().getOkHttpClient();
+        if (command.getPerformer() != null) {
+            client = command.getPerformer().getOkHttpClient();
         }
         client = client == null ? getOkHttpClient() : client;
         return client;

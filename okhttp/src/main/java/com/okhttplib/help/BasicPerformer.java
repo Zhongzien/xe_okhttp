@@ -19,7 +19,7 @@ import okhttp3.Response;
  * 命令执行者基类
  */
 
-public abstract class BasicOkPerformer {
+public abstract class BasicPerformer {
 
     private OkHttpClient mHttpClient;
 
@@ -27,7 +27,7 @@ public abstract class BasicOkPerformer {
     protected final ParamsInterceptor paramsInterceptor;
     protected final MediaTypeInterceptor mediaTypeInterceptor;
 
-    BasicOkPerformer(Configuration config) {
+    BasicPerformer(Configuration config) {
         okHttpInterceptors = config.getMsgInterceptor();
         paramsInterceptor = config.getParamsInterceptor();
         mediaTypeInterceptor = config.getMediaTypeInterceptor();
@@ -70,8 +70,8 @@ public abstract class BasicOkPerformer {
         try {
             if (res != null) {
                 if (res.isSuccessful()) {
-                    if (command.getDownloadPerformer() != null) {
-                        return command.getDownloadPerformer().downloadInfo(info, res, null);
+                    if (command.getPerformer() != null) {
+                        return command.getPerformer().downloadInfo(info, res, null);
                     } else {
                         return updateInfo(info, res.code(), HttpInfo.NET_SUCCESS, res.body().string());
                     }
@@ -114,4 +114,12 @@ public abstract class BasicOkPerformer {
             }
         }
     }
+
+    protected void doRequestAsync(HttpCommand command) {
+    }
+
+    protected void doRequestSync(HttpCommand command) {
+    }
+
+    ;
 }

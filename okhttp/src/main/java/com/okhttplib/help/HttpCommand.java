@@ -22,10 +22,9 @@ public final class HttpCommand {
     @RequestMethod
     int requestMethod;
 
-    private HttpPerformer httpPerformer;
+    private BasicPerformer httpPerformer;
 
-    private UploadPerformer uploadPerformer;
-    private DownloadPerformer downLoadPerformer;
+    private BasicPerformer downOrUp;
 
     private HttpCommand(Builder builder) {
         info = builder.info;
@@ -34,10 +33,10 @@ public final class HttpCommand {
         httpPerformer = new HttpPerformer(builder.config);
 
         if (info.getUploadFiles() != null && !info.getUploadFiles().isEmpty())
-            uploadPerformer = new UploadPerformer(builder.config);
+            downOrUp = new UploadPerformer(builder.config);
 
         if (info.getDownloadFile() != null)
-            downLoadPerformer = new DownloadPerformer(builder.config);
+            downOrUp = new DownloadPerformer(builder.config);
     }
 
     public void doRequestAsync() {
@@ -49,16 +48,16 @@ public final class HttpCommand {
     }
 
     public void doFileUploadAsync() {
-        uploadPerformer.doRequestAsync(this);
+        downOrUp.doRequestAsync(this);
     }
 
     @Deprecated
     public void doFileUploadSync() {
-        uploadPerformer.doRequestSync(this);
+        downOrUp.doRequestSync(this);
     }
 
     public void doDownloadAsync() {
-        downLoadPerformer.doRequestAsync(this);
+        downOrUp.doRequestAsync(this);
     }
 
     public static Builder getBuilder() {
@@ -115,12 +114,8 @@ public final class HttpCommand {
         return info;
     }
 
-    public UploadPerformer getUploadPerformer() {
-        return uploadPerformer;
-    }
-
-    public DownloadPerformer getDownloadPerformer() {
-        return downLoadPerformer;
+    public BasicPerformer getPerformer() {
+        return downOrUp;
     }
 
     public

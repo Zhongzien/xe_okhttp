@@ -23,7 +23,7 @@ import okhttp3.Response;
  * Created by Administrator on 2017/5/9 0009.
  */
 
-public class DownloadPerformer extends BasicOkPerformer {
+public class DownloadPerformer extends BasicPerformer {
 
     private String defaultDirPath;
 

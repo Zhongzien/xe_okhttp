@@ -20,7 +20,7 @@ import okhttp3.RequestBody;
  * 分别提供同步和异步请求
  */
 
-public class UploadPerformer extends BasicOkPerformer  {
+public class UploadPerformer extends BasicPerformer {
 
     UploadPerformer(Configuration config) {
         super(config);

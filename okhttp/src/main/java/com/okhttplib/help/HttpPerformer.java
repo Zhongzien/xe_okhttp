@@ -11,6 +11,7 @@ import com.okhttplib.bean.UploadFileInfo;
 import com.okhttplib.callback.OnResultCallBack;
 import com.okhttplib.config.Configuration;
 import com.okhttplib.handler.HttpMainHandler;
+import com.okhttplib.manage.BasicCallManage;
 
 import java.io.File;
 import java.io.IOException;
@@ -61,18 +62,20 @@ public class HttpPerformer extends BasicPerformer {
             return;
         }
         Call call = checkHttpClient(command).newCall(buildRequest(info, command.getRequestMethod()));
+        BasicCallManage.putCall(info.getCallTag(), call);
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 updateInfo(info, HttpInfo.NET_FAILURE, e.getMessage());
                 sendMessage(info, callBack);
+                BasicCallManage.removeCall(info.getCallTag(), call);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 doResponse(command, response);
                 sendMessage(info, callBack);
-                if (!call.isCanceled()) call.cancel();
+                BasicCallManage.removeCall(info.getCallTag(), call);
             }
         });
     }
@@ -81,13 +84,15 @@ public class HttpPerformer extends BasicPerformer {
     public void doRequestSync(HttpCommand command) {
         final OnResultCallBack callBack = command.getCallBack();
         final HttpInfo info = command.getInfo();
+        Call call = null;
         if (!checkUrl(info.getUrl())) {
             if (callBack != null)
                 callBack.onResponse(updateInfo(info, HttpInfo.CHECK_URL));
             return;
         }
         try {
-            Call call = checkHttpClient(command).newCall(buildRequest(info, command.getRequestMethod()));
+            call = checkHttpClient(command).newCall(buildRequest(info, command.getRequestMethod()));
+            BasicCallManage.putCall(info.getCallTag(), call);
             Response response = call.execute();
             doResponse(command, response);
         } catch (SocketTimeoutException e) {
@@ -105,6 +110,7 @@ public class HttpPerformer extends BasicPerformer {
         } finally {
             if (callBack != null)
                 callBack.onResponse(info);
+            BasicCallManage.removeCall(info.getCallTag(), call);
         }
     }
 

@@ -26,6 +26,12 @@ public class HttpInfo {
     private HashMap<String, String> params;
     private String url;
     private HashMap<String, String> heads;
+    private String callTag;
+
+    public HttpInfo addCallTag(String callTag) {
+        if (TextUtils.isEmpty(callTag)) this.callTag = callTag;
+        return this;
+    }
 
     public HttpInfo addHeads(HashMap<String, String> heads) {
         this.heads = heads;
@@ -49,6 +55,10 @@ public class HttpInfo {
     public HttpInfo addUrl(String url) {
         this.url = url;
         return this;
+    }
+
+    public String getCallTag() {
+        return callTag;
     }
 
     public HashMap<String, String> getHeads() {

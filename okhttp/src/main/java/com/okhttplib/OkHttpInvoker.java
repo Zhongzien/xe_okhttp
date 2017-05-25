@@ -10,10 +10,13 @@ import com.okhttplib.callback.OnProgressCallBack;
 import com.okhttplib.config.Configuration;
 import com.okhttplib.callback.OnResultCallBack;
 import com.okhttplib.help.HttpCommand;
+import com.okhttplib.manage.BasicCallManage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import okhttp3.Call;
 
 /**
  * 命令请求者角色
@@ -225,5 +228,21 @@ public class OkHttpInvoker implements OkHttpInter {
 
     public static void pause(String key) {
         HttpCommand.updateDownloadStatus(key, DownloadStatus.PAUSE);
+    }
+
+    public static void putCall(String key, Call call) {
+        BasicCallManage.putCall(key, call);
+    }
+
+    public static void removeCallOrSet(String key) {
+        BasicCallManage.removeCallOrSet(key, null);
+    }
+
+    public static void removeCallOrSer(String key, Call call) {
+        BasicCallManage.removeCallOrSet(key, call);
+    }
+
+    public static void romoveCall(String key, Call call) {
+        BasicCallManage.removeCall(key, call);
     }
 }

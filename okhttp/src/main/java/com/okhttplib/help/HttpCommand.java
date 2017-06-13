@@ -4,7 +4,7 @@ import com.okhttplib.HttpInfo;
 import com.okhttplib.annotation.DownloadStatus;
 import com.okhttplib.annotation.RequestMethod;
 import com.okhttplib.callback.OnResultCallBack;
-import com.okhttplib.config.Configuration;
+import com.okhttplib.Configuration;
 
 /**
  * 命令角色

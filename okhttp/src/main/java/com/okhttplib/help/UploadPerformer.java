@@ -4,7 +4,7 @@ import android.text.TextUtils;
 
 import com.okhttplib.HttpInfo;
 import com.okhttplib.bean.UploadFileInfo;
-import com.okhttplib.config.Configuration;
+import com.okhttplib.Configuration;
 
 import java.io.File;
 import java.util.HashMap;

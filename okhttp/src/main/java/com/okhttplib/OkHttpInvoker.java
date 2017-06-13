@@ -7,7 +7,6 @@ import com.okhttplib.annotation.RequestMethod;
 import com.okhttplib.bean.DownloadFileInfo;
 import com.okhttplib.bean.UploadFileInfo;
 import com.okhttplib.callback.OnProgressCallBack;
-import com.okhttplib.config.Configuration;
 import com.okhttplib.callback.OnResultCallBack;
 import com.okhttplib.help.HttpCommand;
 import com.okhttplib.manage.BasicCallManage;
@@ -22,7 +21,7 @@ import okhttp3.Call;
  * 命令请求者角色
  */
 
-public class OkHttpInvoker implements OkHttpInter {
+public final class OkHttpInvoker implements OkHttpInter {
 
     private static Configuration mConfig;
 
@@ -216,7 +215,7 @@ public class OkHttpInvoker implements OkHttpInter {
         if (mConfig == null) {
             synchronized (OkHttpInvoker.class) {
                 if (mConfig == null)
-                    new Configuration.Builder().bindConfig();
+                    Configuration.getDefBuilder().bindConfig();
             }
         }
         return mConfig;

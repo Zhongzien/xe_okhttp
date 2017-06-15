@@ -38,7 +38,7 @@ public final class Configuration {
         return new Configuration.Builder();
     }
 
-    public static Builder getConfigBuilder(Context context) {
+    public static Builder getConfigBuilder(@NonNull Context context) {
         return new Configuration.Builder(context);
     }
 

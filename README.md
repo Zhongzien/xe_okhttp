@@ -168,4 +168,27 @@ Configuration的配置方式
                     }
                 });
     以上是多文件异步上传，多文件同步上传同多文件异步上传，在调用方式上没有区别，只是注意要在外层包裹着子线程
+
+##v2.1.1
+####修改
+1.对 Configuration 的自定义配置，只能通过 getConfigBuilder() 来获取 Builder 来完成数据配置，该方法需要传入一个 Context 类型的参数，且不能为参数不能为空，最后调用 bindConfig() 完成整个绑定，整个过程不在需要关心 Configuration 和 OkHttpInvoker
+
+2.把同步上传的方法从 API 中删除
+
+####新增
+1.新增文件下载 doDownloadAsync() 方法，使用方式如下：
+
+    OkHttpInvoker.getBuilder().
+        addDownloadFile(url, downloadFileDir, "download_test.apk", new OnProgressCallBack() {
+            @Override
+            public void onProgress(long percent, long curLength, long totalLength) {
+                
+            }
     
+            @Override
+            public void onResponse(HttpInfo info) {
+                
+            }
+            }).build().doDownloadAsync();
+
+2.新增cookies管理以及cookies持久化，默认不使用 cookies 策略，开启方式只需要在配置 Configuration 的时候调用 setCookiesStrong() 即可，需要注意：false 表示开启 cookies 但不持久化；true 表示开启 cookies 并且持久化

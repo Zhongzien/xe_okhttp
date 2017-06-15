@@ -96,7 +96,7 @@ public final class OkHttpInvoker implements OkHttpInter {
         }
     }
 
-    public static void config(Configuration config) {
+    static void config(Configuration config) {
         if (mConfig == null) {
             synchronized (OkHttpInvoker.class) {
                 if (mConfig == null)

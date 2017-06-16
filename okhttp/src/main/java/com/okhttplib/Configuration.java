@@ -91,7 +91,7 @@ public final class Configuration {
             return this;
         }
 
-        public Builder addCacheFile(File file) {
+        private Builder addCacheFile(File file) {
             if (file != null) {
                 cacheFile = file;
                 if (cacheMaxSize <= 0)
@@ -100,7 +100,7 @@ public final class Configuration {
             return this;
         }
 
-        public Builder addCacheSize(long size) {
+        private Builder addCacheSize(long size) {
             if (size > 0) {
                 cacheMaxSize = size;
             }

@@ -64,7 +64,7 @@ public final class HttpCommand {
         return new Builder();
     }
 
-    public static class Builder {
+    public final static class Builder {
 
         private OnResultCallBack callBack;
         private HttpInfo info;

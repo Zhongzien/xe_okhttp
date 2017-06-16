@@ -1,107 +1,102 @@
-# xe_okhttp
-first upload to git
+# xe_okhttp使用手册
 
-##V1.0
-只提供post和get的异步请求。
+由于我是用公司的接口来测试的这里就不提供接口和数据
 
-允许用户自定义Configuration，如不定义就使用默认的Configuration。
+##1.Configuration 配置
 
-可以自定义消息拦截器 MsgInterceptor ,对返回信息进行处理，并通过Configuration注册访问框架。
+    Configuration.getConfigBuilder(this).addParamsInterceptor(new MyInterceptor()).bindConfig();
 
-Configuration的配置方式
+说明：
+
+Configuration 的配置建议在 Application 中进行配置，且整个程序有且只有一个 Configuration ；在实际应用中如果没有特殊需求可以不配 Configuration ，系统会默认配置。
+
+##2.网络请求：
+
+<1>.异步post请求：
     
-    如果没有特殊的需求 Configuration 可以不去配置，框架会提供默认配置。
-    如果需要配置可以按下面这种方式进行配置：
-    
-    方式一：（实例化一个新的 Configuration 重新配置）
-    Configuration config = new Configuration.Builder().
-                    addParamsInterceptor(new MyInterceptor()).
-                    build();
-    OkHttpInvoker.config(config);
-    
-    方式二：（获取默认的 Configuration 根据需要覆盖参数）
-    OkHttpInvoker.config(
-                    Configuration.getConfigBulider().
-                    addParamsInterceptor(new MyInterceptor()).
-                    build());
-    
-异步请求
-
-        方式一：
-         HashMap<String, String> map = new HashMap<>();
-         map.put("username", "iyihua");
-         map.put("password", "123456");
-         OkHttpInvoker.getDefaultBuilder().setUrl("http://192.168.1.128:8091/login").
-         addParams(map).build().doPostAsync(new OnResultCallBack() {
-             @Override
-             public void onResponse(HttpInfo info) {
-                 if (info.isSuccess()) {
-                     Log.i(TAG, "doPostAsync:" + info.getResultBody());
-                 } else {
-                     Log.i(TAG, "doPostAsync:" + info.getMsg());
-                 }
-             }
-         });
-        
-        方式二：
-        OkHttpInvoker.getDefaultBuilder().setUrl("http://192.168.1.128:8091/login").
-                        addParam("username", "iyihua").
-                        addParam("password", "123456").
-                        build().doPostAsync(new OnResultCallBack() {
-                    @Override
-                    public void onResponse(HttpInfo info) {
-                        if (info.isSuccess()) {
-                            Log.i(TAG, "doGetAsync:" + info.getResultBody());
-                        } else {
-                            Log.i(TAG, "doGetAsync:" + info.getMsg());
-                        }
+            OkHttpInvoker.getBuilder().setUrl(url)
+                    .setCallTag(tag) // ①
+                    .addParam(key, value)
+                    .addParam(key, value)
+                    .build().doPostAsync(new OnResultCallBack() {
+                @Override
+                public void onResponse(HttpInfo info) {
+                    if (info.isSuccess()) {
+                        Log.i(TAG, "doPostAsync:" + info.getResultBody());
+                    } else {
+                        Log.i(TAG, "doPostAsync:" + info.getMsg());
                     }
-                });
-                
-        上面例子是均为POST请求，若需要GET请求只需要在build以后调用doGetAsync请求机即可。
-        
-##v1.1 
-新增同步网络请求
+                }
+            });
+            
+<2>.同步post请求：
 
-新增参数拦截器，应对在提交数据之前进行数据加密、增加默认参数等情况,并通过Configuration注册访问框架。
-
-对OnResultCallBack进行了修改，上一个有OnSuccess 和 onFailure 两个函数，现修个为OnResponse
-
-同步请求
-
-        同步请求同意提供POST和GET两种请求方式（doPostSync和doGetSync），的参数添加方式和异步的参数添加方式一样。
-        例子如下：
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                OkHttpInvoker.getDefaultBuilder().setUrl("http://192.168.1.128:8091/login").
-                        addParam("username", "iyihua").
-                        addParam("password", "123456").build().
-                        doPostSync(new OnResultCallBack() {
-                            @Override
-                            public void onResponse(HttpInfo info) {
-                                if (info.isSuccess()) {
-                                    Log.i(TAG, "doPostSync:" + info.getResultBody());
-                                } else {
-                                    Log.i(TAG, "doPostSync:" + info.getMsg());
-                                }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    OkHttpInvoker.getBuilder().setUrl(url)
+                            .setCallTag(tag) // ①
+                            .addParam(key, value)
+                            .addParam(key, value)
+                            .build().doPostSync(new OnResultCallBack() {
+                        @Override
+                        public void onResponse(HttpInfo info) {
+                            if (info.isSuccess()) {
+                                Log.i(TAG, "doPostSync:" + info.getResultBody());
+                            } else {
+                                Log.i(TAG, "doPostSync:" + info.getMsg());
                             }
-                        });
-            }
-        }).start();
+                        }
+                    });
+                }
+            }).start();
+            
+<3>.异步get请求：
+    
+            OkHttpInvoker.getBuilder().setUrl(url)
+                    .setCallTag(tag) // ①
+                    .build().doGetAsync(new OnResultCallBack() {
+                @Override
+                public void onResponse(HttpInfo info) {
+                    if (info.isSuccess()) {
+                        Log.i(TAG, "doGetAsync:" + info.getResultBody());
+                    } else {
+                        Log.i(TAG, "doGetAsync:" + info.getMsg());
+                    }
+                }
+            });
 
-##v2.0
-新增文件上传，支持多格式文件上传
+<4>.同步get请求:
 
-上传方式提供同步/异步两种，同时均支持单文件/多文件上传
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    OkHttpInvoker.getBuilder().setUrl(url)
+                            .setCallTag(tag) // ①
+                            .build().
+                            doGetSync(new OnResultCallBack() {
+                                @Override
+                                public void onResponse(HttpInfo info) {
+                                    if (info.isSuccess()) {
+                                        Log.i(TAG, "doGetSync:" + info.getResultBody());
+                                    } else {
+                                        Log.i(TAG, "doGetAsync:" + info.getMsg());
+                                    }
+                                }
+                            });
+                }
+            }).start();
+            
+说明：
 
-可以通过实现 MediaTypeInterceptor 接口，自定上传文件的格式（系统默认设有默认格式拦截器）,最后通过Configuration注册访问框架。
+get 请求同样可以使用 post 请求的传参方式，框架会自动把 URL 拼接完整。
 
-单文件上传：
+上面注释 ① 处代码如果不需要对网络访问进行分组管理可以不调用，不会对程序正常运行造成影响。若调用了该方法可以把分组管理交由程序去完成，也可以自行对分组进行管理，管理所需方法见 API 。
 
-        同步上传：
-        OkHttpInvoker.getDefaultBuilder().
-                    setUrl(url).addUploadFile("file", filePathOne).
+##3.文件上传
+
+            OkHttpInvoker.getBuilder().
+                    setUrl(url).addUploadFile(key, filePath).
                     build().doUploadAsync(new OnResultCallBack() {
                 @Override
                 public void onResponse(HttpInfo info) {
@@ -110,85 +105,106 @@ Configuration的配置方式
                     } else {
                         Log.i(TAG, "failure:" + info.getResultBody());
                     }
-    
                 }
             });
-            
-        同步上传：
-        new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    OkHttpInvoker.getDefaultBuilder().
-                            addUploadFile("file2", filePathTwo).
-                            setUrl(url).build().
-                            doUploadSync(new OnResultCallBack() {
+     
+说明：
+
+文件上传支持单文件上传、多文件上传、批量上传，上传的同时可以带除文件信息以外信息一起上传。
+
+#4.文件下载
+
+            OkHttpInvoker.getBuilder().
+                    addDownloadFile(url, saveDir, saveFileName, new OnProgressCallBack() {
+                        @Override
+                        public void onProgress(long percent, long curLength, long totalLength) {
+                            Log.i(TAG, "curLength:" + curLength);
+                        }
+    
                         @Override
                         public void onResponse(HttpInfo info) {
-                            if (info.isSuccess()) {
-                                Log.i(TAG, "success:" + info.getResultBody());
-                            } else {
-                                Log.i(TAG, "failure:" + info.getResultBody());
-                            }
+                            Log.i(TAG, "onResponse:" + info.getResultBody());
                         }
-                    });
-                }
-            }).start();
-    
-多文件上传
-    
-    方式一：
-    OkHttpInvoker.getDefaultBuilder().
-                setUrl(url).addUploadFile("file1", filePathOne).
-                addUploadFile("file2", filePathTwo).
-                build().doUploadAsync(new OnResultCallBack() {
-            @Override
-            public void onResponse(HttpInfo info) {
-                if (info.isSuccess()) {
-                    Log.i(TAG, "success:" + info.getResultBody());
-                } else {
-                    Log.i(TAG, "failure:" + info.getResultBody());
-                }
-            }
-        });
-        
-        方式二：
-        List<UploadFileInfo> infoList = new ArrayList<>();
-        infoList.add(new UploadFileInfo("file1",filePathOne));
-        infoList.add(new UploadFileInfo("file2",filePathTwo));
-        OkHttpInvoker.getDefaultBuilder().
-                        setUrl(url).addUploadFiles(infoList).
-                        build().doUploadAsync(new OnResultCallBack() {
-                    @Override
-                    public void onResponse(HttpInfo info) {
-                        if (info.isSuccess()) {
-                            Log.i(TAG, "success:" + info.getResultBody());
-                        } else {
-                            Log.i(TAG, "failure:" + info.getResultBody());
-                        }
-                    }
-                });
-    以上是多文件异步上传，多文件同步上传同多文件异步上传，在调用方式上没有区别，只是注意要在外层包裹着子线程
+                    }).build().doDownloadAsync();
+                    
+说明：
 
-##v2.1.1
-####修改
-1.对 Configuration 的自定义配置，只能通过 getConfigBuilder() 来获取 Builder 来完成数据配置，该方法需要传入一个 Context 类型的参数，且不能为参数不能为空，最后调用 bindConfig() 完成整个绑定，整个过程不在需要关心 Configuration 和 OkHttpInvoker
+文件下载支持批量加载，支持断点下载。同一个文件可以重复下载，程序内置重名防止文件相互覆盖。
 
-2.把同步上传的方法从 API 中删除
+##5.API
 
-####新增
-1.新增文件下载 doDownloadAsync() 方法，使用方式如下：
+class com.okhttplib.OkHttpInter
 
-    OkHttpInvoker.getBuilder().
-        addDownloadFile(url, downloadFileDir, "download_test.apk", new OnProgressCallBack() {
-            @Override
-            public void onProgress(long percent, long curLength, long totalLength) {
-                
-            }
-    
-            @Override
-            public void onResponse(HttpInfo info) {
-                
-            }
-            }).build().doDownloadAsync();
+/**
+* 异步 post 请求
+* @param callBack 网络访问回调接口
+*/
+void doPostAsync(OnResultCallBack callBack) 
 
-2.新增cookies管理以及cookies持久化，默认不使用 cookies 策略，开启方式只需要在配置 Configuration 的时候调用 setCookiesStrong() 即可，需要注意：false 表示开启 cookies 但不持久化；true 表示开启 cookies 并且持久化
+/**
+* 异步 get 请求
+* @param callBack 网络访问回调接口
+*/
+void doGetAsync(OnResultCallBack callBack) 
+
+/**
+* 同步 post 请求
+* @param callBack 网络访问回调接口
+*/
+void doPostSync(OnResultCallBack callBack) 
+
+/**
+* 同步 get 请求
+* @param callBack 网络访问回调接口
+*/
+void doGetSync(OnResultCallBack callBack) 
+
+/**
+* 文件上传
+* @param callBack 网络访问回调接口
+*/
+void doUploadAsync(OnResultCallBack callBack)
+
+/**
+* 文件下载
+*/
+void doDownloadAsync()
+
+/**
+* 用于网络访问分组管理，向分组集合中添加新的 call
+* @param key 分组标识 不能为 null
+* @param call 需要管理的请求
+*/
+public static void putCall(String key, Call call)
+
+/**
+* 用于网络访问分组管理，根据 key 删除 key 标识的分组集合元素
+* @param key 分组标识 不能为 null
+*/
+public static void removeCallOrSet(String key)
+
+/**
+* 用于网络访问分组管理，根据 key 和 call 删除分组集合元素，如果 call 为 null 删除 key 标识的分组集合元素
+* @param key 分组标识 不能为 null
+* @param call 需要管理的请求
+*/
+public static void removeCallOrSer(String key, Call call)
+
+/**
+* 用于网络访问分组管理，根据 key 和 call 删除分组集合元素，如果 call 为 null 操作无效
+* @param key 分组标识 不能为 null
+* @param call 需要管理的请求
+*/
+public static void removeCall(String key, Call call)
+
+/**
+* 根据 key 标识停止下载
+* @param key 不能为 null
+*/
+public static void stop(String key)
+
+/**
+* 根据 key 标识暂停下载
+* @param key 不能为 null
+*/
+public static void pause(String key)

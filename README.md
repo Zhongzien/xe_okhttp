@@ -172,30 +172,35 @@ class com.okhttplib.OkHttpInter
 * 异步 post 请求
 * @param callBack 网络访问回调接口
 */
+
 void doPostAsync(OnResultCallBack callBack) 
 
 /**
 * 异步 get 请求
 * @param callBack 网络访问回调接口
 */
+
 void doGetAsync(OnResultCallBack callBack) 
 
 /**
 * 同步 post 请求
 * @param callBack 网络访问回调接口
 */
+
 void doPostSync(OnResultCallBack callBack) 
 
 /**
 * 同步 get 请求
 * @param callBack 网络访问回调接口
 */
+
 void doGetSync(OnResultCallBack callBack) 
 
 /**
 * 文件上传
 * @param callBack 网络访问回调接口
 */
+
 void doUploadAsync(OnResultCallBack callBack)
 
 /**
@@ -208,36 +213,42 @@ void doDownloadAsync()
 * @param key 分组标识 不能为 null
 * @param call 需要管理的请求
 */
-public static void putCall(String key, Call call)
+
+static void putCall(String key, Call call)
 
 /**
 * 用于网络访问分组管理，根据 key 删除 key 标识的分组集合元素
 * @param key 分组标识 不能为 null
 */
-public static void removeCallOrSet(String key)
+
+ static void removeCallOrSet(String key)
 
 /**
 * 用于网络访问分组管理，根据 key 和 call 删除分组集合元素，如果 call 为 null 删除 key 标识的分组集合元素
 * @param key 分组标识 不能为 null
 * @param call 需要管理的请求
 */
-public static void removeCallOrSer(String key, Call call)
+
+static void removeCallOrSer(String key, Call call)
 
 /**
 * 用于网络访问分组管理，根据 key 和 call 删除分组集合元素，如果 call 为 null 操作无效
 * @param key 分组标识 不能为 null
 * @param call 需要管理的请求
 */
-public static void removeCall(String key, Call call)
+
+static void removeCall(String key, Call call)
 
 /**
 * 根据 key 标识停止下载
 * @param key 不能为 null
 */
-public static void stop(String key)
+
+static void stop(String key)
 
 /**
 * 根据 key 标识暂停下载
 * @param key 不能为 null
 */
-public static void pause(String key)
+
+static void pause(String key)

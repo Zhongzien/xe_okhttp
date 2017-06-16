@@ -29,7 +29,7 @@ public class HttpInfo {
     private String callTag;
 
     public HttpInfo addCallTag(String callTag) {
-        if (TextUtils.isEmpty(callTag)) this.callTag = callTag;
+        if (callTag != null) this.callTag = callTag;
         return this;
     }
 

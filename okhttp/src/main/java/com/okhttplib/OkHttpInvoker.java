@@ -1,5 +1,6 @@
 package com.okhttplib;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.okhttplib.annotation.DownloadStatus;
@@ -113,6 +114,7 @@ public final class OkHttpInvoker implements OkHttpInter {
         HttpInfo info = HttpInfo.getInstance().
                 addUrl(mBuilder.url).
                 addParams(mBuilder.params).
+                addCallTag(mBuilder.callTag).
                 addHeads(mBuilder.heads);
         return info;
     }
@@ -127,8 +129,14 @@ public final class OkHttpInvoker implements OkHttpInter {
         List<UploadFileInfo> uploadFiles;
         //文件下载
         private List<DownloadFileInfo> downloadFiles;
+        public String callTag;
 
         public Builder() {
+        }
+
+        public Builder setCallTag(@NonNull String tag) {
+            callTag = tag;
+            return this;
         }
 
         public Builder setUrl(String url) {

@@ -25,7 +25,7 @@ import ui.xe.com.xe_okhttp.util.FilePathUtil;
 public class UploadActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = UploadActivity.class.getSimpleName();
 
-    private String url = "http://192.168.1.128:8091/upload/uploadSingleImage";
+    private String url = "";
 
     private String filePathOne;
     private String filePathTwo;
@@ -89,24 +89,24 @@ public class UploadActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void uploadImgTwo() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                OkHttpInvoker.getBuilder().
-                        addUploadFile("file2", filePathTwo).
-                        setUrl(url).build().
-                        doUploadSync(new OnResultCallBack() {
-                    @Override
-                    public void onResponse(HttpInfo info) {
-                        if (info.isSuccess()) {
-                            Log.i(TAG, "doUploadSync success:" + info.getResultBody());
-                        } else {
-                            Log.i(TAG, "doUploadSync failure:" + info.getResultBody());
-                        }
-                    }
-                });
-            }
-        }).start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                OkHttpInvoker.getBuilder().
+//                        addUploadFile("file2", filePathTwo).
+//                        setUrl(url).build().
+//                        doUploadSync(new OnResultCallBack() {
+//                    @Override
+//                    public void onResponse(HttpInfo info) {
+//                        if (info.isSuccess()) {
+//                            Log.i(TAG, "doUploadSync success:" + info.getResultBody());
+//                        } else {
+//                            Log.i(TAG, "doUploadSync failure:" + info.getResultBody());
+//                        }
+//                    }
+//                });
+//            }
+//        }).start();
     }
 
     private void uploadImgMulti() {

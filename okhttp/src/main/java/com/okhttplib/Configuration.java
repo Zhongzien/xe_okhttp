@@ -1,6 +1,8 @@
-package com.okhttplib.config;
+package com.okhttplib;
 
-import com.okhttplib.OkHttpInvoker;
+import android.content.Context;
+import android.support.annotation.NonNull;
+
 import com.okhttplib.interceptor.MediaTypeInterceptor;
 import com.okhttplib.interceptor.MsgInterceptor;
 import com.okhttplib.interceptor.ParamsInterceptor;
@@ -11,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Cookie;
 import okhttp3.OkHttpClient;
 
 /**
@@ -31,8 +34,12 @@ public final class Configuration {
         mBuilder = builder;
     }
 
-    public static Builder getConfigBulider() {
+    protected static Builder getDefBuilder() {
         return new Configuration.Builder();
+    }
+
+    public static Builder getConfigBuilder(@NonNull Context context) {
+        return new Configuration.Builder(context);
     }
 
     public final static class Builder {
@@ -44,17 +51,28 @@ public final class Configuration {
         private File cacheFile;
         private long cacheMaxSize;
 
-        private String saveDirPaht;
+        private String saveDirPath;
 
         private List<MsgInterceptor> okHttpInterceptors;
         private ParamsInterceptor paramsInterceptor;
         private MediaTypeInterceptor mediaTypeInterceptor;
 
-        public Builder() {
+        private boolean isCookiesJar;
+        private boolean isCookiesStrong;
+        public Context context;
+
+        private Builder() {
+            initDefaultConfig();
+        }
+
+        private Builder(@NonNull Context context) {
+            this.context = context;
             initDefaultConfig();
         }
 
         private void initDefaultConfig() {
+            isCookiesJar = false;
+            isCookiesStrong = false;
             addConnectTimeOut(DEFAULT_TIME_OUT);
             addReadTimeOut(DEFAULT_TIME_OUT);
             addWriteTimeOut(DEFAULT_TIME_OUT);
@@ -62,8 +80,8 @@ public final class Configuration {
             mediaTypeInterceptor = new DefaultUploadInterceptor();
         }
 
-        public Builder addSaveDirPath(String dir) {
-            saveDirPaht = dir;
+        private Builder addSaveDirPath(String dir) {
+            saveDirPath = dir;
             return this;
         }
 
@@ -73,7 +91,7 @@ public final class Configuration {
             return this;
         }
 
-        public Builder addCacheFile(File file) {
+        private Builder addCacheFile(File file) {
             if (file != null) {
                 cacheFile = file;
                 if (cacheMaxSize <= 0)
@@ -82,10 +100,16 @@ public final class Configuration {
             return this;
         }
 
-        public Builder addCacheSize(long size) {
+        private Builder addCacheSize(long size) {
             if (size > 0) {
                 cacheMaxSize = size;
             }
+            return this;
+        }
+
+        public Builder setCookiesStrong(boolean isCookiesStrong) {
+            isCookiesJar = true;
+            this.isCookiesStrong = isCookiesStrong;
             return this;
         }
 
@@ -181,6 +205,19 @@ public final class Configuration {
     }
 
     public String getSaveDirPath() {
-        return mBuilder.saveDirPaht;
+        return mBuilder.saveDirPath;
     }
+
+    public boolean isCookiesJar() {
+        return mBuilder.isCookiesJar;
+    }
+
+    public boolean isCookieStrong() {
+        return mBuilder.isCookiesStrong;
+    }
+
+    public Context getContext() {
+        return mBuilder.context;
+    }
+
 }

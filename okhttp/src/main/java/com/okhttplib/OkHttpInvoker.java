@@ -1,5 +1,6 @@
 package com.okhttplib;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.okhttplib.annotation.DownloadStatus;
@@ -7,7 +8,6 @@ import com.okhttplib.annotation.RequestMethod;
 import com.okhttplib.bean.DownloadFileInfo;
 import com.okhttplib.bean.UploadFileInfo;
 import com.okhttplib.callback.OnProgressCallBack;
-import com.okhttplib.config.Configuration;
 import com.okhttplib.callback.OnResultCallBack;
 import com.okhttplib.help.HttpCommand;
 import com.okhttplib.manage.BasicCallManage;
@@ -22,7 +22,7 @@ import okhttp3.Call;
  * 命令请求者角色
  */
 
-public class OkHttpInvoker implements OkHttpInter {
+public final class OkHttpInvoker extends OkHttpInter {
 
     private static Configuration mConfig;
 
@@ -97,7 +97,7 @@ public class OkHttpInvoker implements OkHttpInter {
         }
     }
 
-    public static void config(Configuration config) {
+    static void config(Configuration config) {
         if (mConfig == null) {
             synchronized (OkHttpInvoker.class) {
                 if (mConfig == null)
@@ -106,7 +106,7 @@ public class OkHttpInvoker implements OkHttpInter {
         }
     }
 
-    public static Builder getBuilder() {
+    public static BuilderInter getBuilder() {
         return new Builder();
     }
 
@@ -114,11 +114,12 @@ public class OkHttpInvoker implements OkHttpInter {
         HttpInfo info = HttpInfo.getInstance().
                 addUrl(mBuilder.url).
                 addParams(mBuilder.params).
+                addCallTag(mBuilder.callTag).
                 addHeads(mBuilder.heads);
         return info;
     }
 
-    public static class Builder {
+    public static class Builder implements BuilderInter {
 
         ////普通请求
         private String url;
@@ -128,16 +129,25 @@ public class OkHttpInvoker implements OkHttpInter {
         List<UploadFileInfo> uploadFiles;
         //文件下载
         private List<DownloadFileInfo> downloadFiles;
+        public String callTag;
 
-        public Builder() {
+        protected Builder() {
         }
 
-        public Builder setUrl(String url) {
+        @Override
+        public BuilderInter setCallTag(@NonNull String tag) {
+            callTag = tag;
+            return this;
+        }
+
+        @Override
+        public BuilderInter setUrl(String url) {
             this.url = url;
             return this;
         }
 
-        public Builder addParams(HashMap<String, String> params) {
+        @Override
+        public BuilderInter addParams(HashMap<String, String> params) {
             if (params != null) {
                 if (this.params == null) this.params = new HashMap<>();
                 this.params.putAll(params);
@@ -145,7 +155,8 @@ public class OkHttpInvoker implements OkHttpInter {
             return this;
         }
 
-        public Builder addParam(String key, String value) {
+        @Override
+        public BuilderInter addParam(String key, String value) {
             if (!TextUtils.isEmpty(key)) {
                 if (params == null) params = new HashMap<>();
                 params.put(key, value);
@@ -153,7 +164,8 @@ public class OkHttpInvoker implements OkHttpInter {
             return this;
         }
 
-        public Builder addHeads(HashMap<String, String> heads) {
+        @Override
+        public BuilderInter addHeads(HashMap<String, String> heads) {
             if (heads != null) {
                 if (this.heads == null) this.heads = new HashMap<>();
                 this.heads.putAll(heads);
@@ -161,7 +173,8 @@ public class OkHttpInvoker implements OkHttpInter {
             return this;
         }
 
-        public Builder addHead(String key, String value) {
+        @Override
+        public BuilderInter addHead(String key, String value) {
             if (!TextUtils.isEmpty(key)) {
                 if (heads == null) heads = new HashMap<>();
                 heads.put(key, value);
@@ -169,7 +182,8 @@ public class OkHttpInvoker implements OkHttpInter {
             return this;
         }
 
-        public Builder addUploadFiles(List<UploadFileInfo> files) {
+        @Override
+        public BuilderInter addUploadFiles(List<UploadFileInfo> files) {
             if (files != null) {
                 if (uploadFiles == null) uploadFiles = new ArrayList<>();
                 uploadFiles.addAll(files);
@@ -177,7 +191,8 @@ public class OkHttpInvoker implements OkHttpInter {
             return this;
         }
 
-        public Builder addUploadFile(String uploadFormat, String fileAbsolutePath) {
+        @Override
+        public BuilderInter addUploadFile(String uploadFormat, String fileAbsolutePath) {
             if (!TextUtils.isEmpty(fileAbsolutePath)) {
                 if (uploadFiles == null) uploadFiles = new ArrayList<>();
                 uploadFiles.add(new UploadFileInfo(uploadFormat, fileAbsolutePath));
@@ -185,7 +200,8 @@ public class OkHttpInvoker implements OkHttpInter {
             return this;
         }
 
-        public Builder addDownloadFiles(List<DownloadFileInfo> files) {
+        @Override
+        public BuilderInter addDownloadFiles(List<DownloadFileInfo> files) {
             if (files != null) {
                 if (downloadFiles == null) downloadFiles = new ArrayList<>();
                 downloadFiles.addAll(files);
@@ -193,12 +209,14 @@ public class OkHttpInvoker implements OkHttpInter {
             return this;
         }
 
-        public Builder addDownloadFile(String url, String saveFileName, OnProgressCallBack callBack) {
+        @Override
+        public BuilderInter addDownloadFile(String url, String saveFileName, OnProgressCallBack callBack) {
             addDownloadFile(url, null, saveFileName, callBack);
             return this;
         }
 
-        public Builder addDownloadFile(String url, String saveDir, String saveFileName, OnProgressCallBack callBack) {
+        @Override
+        public BuilderInter addDownloadFile(String url, String saveDir, String saveFileName, OnProgressCallBack callBack) {
             if (!TextUtils.isEmpty(url)) {
                 if (downloadFiles == null) downloadFiles = new ArrayList<>();
                 downloadFiles.add(new DownloadFileInfo(url, saveDir, saveFileName, callBack));
@@ -206,6 +224,7 @@ public class OkHttpInvoker implements OkHttpInter {
             return this;
         }
 
+        @Override
         public OkHttpInter build() {
             return new OkHttpInvoker(this);
         }
@@ -216,33 +235,10 @@ public class OkHttpInvoker implements OkHttpInter {
         if (mConfig == null) {
             synchronized (OkHttpInvoker.class) {
                 if (mConfig == null)
-                    new Configuration.Builder().bindConfig();
+                    Configuration.getDefBuilder().bindConfig();
             }
         }
         return mConfig;
     }
 
-    public static void stop(String key) {
-        HttpCommand.updateDownloadStatus(key, DownloadStatus.STOP);
-    }
-
-    public static void pause(String key) {
-        HttpCommand.updateDownloadStatus(key, DownloadStatus.PAUSE);
-    }
-
-    public static void putCall(String key, Call call) {
-        BasicCallManage.putCall(key, call);
-    }
-
-    public static void removeCallOrSet(String key) {
-        BasicCallManage.removeCallOrSet(key, null);
-    }
-
-    public static void removeCallOrSer(String key, Call call) {
-        BasicCallManage.removeCallOrSet(key, call);
-    }
-
-    public static void romoveCall(String key, Call call) {
-        BasicCallManage.removeCall(key, call);
-    }
 }

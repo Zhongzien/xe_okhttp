@@ -52,16 +52,14 @@ public class DownLoadActivity extends AppCompatActivity implements View.OnClickL
                             public void onProgress(long percent, long curLength, long totalLength) {
                                 Log.i(TAG, "curLength:" + curLength);
 
-//                                tvPercent.setText(percent + "%");
-//                                pBar.setProgress((int) curLength);
+                                tvPercent.setText(percent + "%");
                             }
 
                             @Override
                             public void onResponse(HttpInfo info) {
                                 Log.i(TAG, "onResponse:" + info.getResultBody());
                             }
-                        }).
-                        build().doDownloadAsync();
+                        }).build().doDownloadAsync();
                 break;
             case R.id.pause_btn:
                 OkHttpInvoker.pause(url);

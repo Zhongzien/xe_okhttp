@@ -5,7 +5,7 @@ import android.text.TextUtils;
 import com.okhttplib.HttpInfo;
 import com.okhttplib.annotation.DownloadStatus;
 import com.okhttplib.bean.DownloadFileInfo;
-import com.okhttplib.config.Configuration;
+import com.okhttplib.Configuration;
 import com.okhttplib.interceptor.DownloadInterceptor;
 import com.okhttplib.utils.DigitalSignature;
 
@@ -26,6 +26,7 @@ import okhttp3.Response;
 public class DownloadPerformer extends BasicPerformer {
 
     private String defaultDirPath;
+    private DownloadInterceptor interceptor;
 
     private static ConcurrentHashMap<String, DownloadFileInfo> downloadMap;
 
@@ -36,7 +37,8 @@ public class DownloadPerformer extends BasicPerformer {
 
     @Override
     protected OkHttpClient buildOkHttpClient(Configuration config) {
-        OkHttpClient httpClient = newOkHttpClientBuilder(config).build();
+        interceptor = new DownloadInterceptor();
+        OkHttpClient httpClient = newOkHttpClientBuilder(config).addInterceptor(interceptor).build();
         return httpClient;
     }
 
@@ -54,7 +56,7 @@ public class DownloadPerformer extends BasicPerformer {
         }
         downloadMap.put(fileInfo.getSaveSignaturFileName(), fileInfo);
 
-        getOkHttpClient().interceptors().add(new DownloadInterceptor(fileInfo));
+        interceptor.setDownloadFileInfo(fileInfo);
 
         fileInfo.setCompleteSize(completeSize);
         info.addHead("RANGE", "bytes=" + completeSize + "-");
@@ -200,7 +202,7 @@ public class DownloadPerformer extends BasicPerformer {
                 info.setDownloadStatus(status);
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 

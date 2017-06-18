@@ -16,7 +16,7 @@ public class DownloadInterceptor implements Interceptor {
 
     private DownloadFileInfo fileInfo;
 
-    public DownloadInterceptor(DownloadFileInfo fileInfo) {
+    public void setDownloadFileInfo(DownloadFileInfo fileInfo) {
         this.fileInfo = fileInfo;
     }
 

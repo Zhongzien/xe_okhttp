@@ -15,7 +15,7 @@ import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private String url = "http://api.k780.com:88/?app=life.time&appkey=10003&sign=b59bc3ef6191eb9f747dd4e83c99f2a4&format=json";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

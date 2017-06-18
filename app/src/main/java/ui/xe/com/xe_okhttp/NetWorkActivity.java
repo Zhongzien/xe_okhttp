@@ -19,6 +19,9 @@ import java.util.HashMap;
 public class NetWorkActivity extends AppCompatActivity {
     private static final String TAG = NetWorkActivity.class.getSimpleName();
 
+    private final static String url_head = "";
+    private final static String url_get = url_head + "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,11 +30,10 @@ public class NetWorkActivity extends AppCompatActivity {
     }
 
     public void doPostAsync(View v) {
-        HashMap<String, String> map = new HashMap<>();
-        map.put("username", "iyihua");
-        map.put("password", "123456");
-
-        OkHttpInvoker.getBuilder().setUrl("http://192.168.1.128:8091/login").addParams(map).build().doPostAsync(new OnResultCallBack() {
+        OkHttpInvoker.getBuilder().setUrl(url_head)
+                .setCallTag(TAG)
+                .addParam("", "")
+                .build().doPostAsync(new OnResultCallBack() {
             @Override
             public void onResponse(HttpInfo info) {
                 if (info.isSuccess()) {
@@ -44,9 +46,9 @@ public class NetWorkActivity extends AppCompatActivity {
     }
 
     public void doGetAsync(View v) {
-        OkHttpInvoker.getBuilder().setUrl("http://192.168.1.128:8091/post/list").
-                addParam("cid", "1").build().doGetAsync(new OnResultCallBack() {
-
+        OkHttpInvoker.getBuilder().setUrl(url_get)
+                .setCallTag(TAG)
+                .build().doGetAsync(new OnResultCallBack() {
             @Override
             public void onResponse(HttpInfo info) {
                 if (info.isSuccess()) {
@@ -62,19 +64,19 @@ public class NetWorkActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                OkHttpInvoker.getBuilder().setUrl("http://192.168.1.128:8091/login").
-                        addParam("username", "iyihua").
-                        addParam("password", "123456").build().
-                        doPostSync(new OnResultCallBack() {
-                            @Override
-                            public void onResponse(HttpInfo info) {
-                                if (info.isSuccess()) {
-                                    Log.i(TAG, "doPostSync:" + info.getResultBody());
-                                } else {
-                                    Log.i(TAG, "doPostSync:" + info.getMsg());
-                                }
-                            }
-                        });
+                OkHttpInvoker.getBuilder().setUrl(url_head)
+                        .setCallTag(TAG)
+                        .addParam("", "")
+                        .build().doPostSync(new OnResultCallBack() {
+                    @Override
+                    public void onResponse(HttpInfo info) {
+                        if (info.isSuccess()) {
+                            Log.i(TAG, "doPostSync:" + info.getResultBody());
+                        } else {
+                            Log.i(TAG, "doPostSync:" + info.getMsg());
+                        }
+                    }
+                });
             }
         }).start();
     }
@@ -83,7 +85,9 @@ public class NetWorkActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                OkHttpInvoker.getBuilder().setUrl("http://192.168.1.128:8091/post/list?cid=1").build().
+                OkHttpInvoker.getBuilder().setUrl(url_get)
+                        .setCallTag(TAG)
+                        .build().
                         doGetSync(new OnResultCallBack() {
                             @Override
                             public void onResponse(HttpInfo info) {

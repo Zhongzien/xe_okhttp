@@ -3,10 +3,11 @@ package com.okhttplib.help;
 import android.text.TextUtils;
 
 import com.okhttplib.HttpInfo;
-import com.okhttplib.config.Configuration;
+import com.okhttplib.Configuration;
 import com.okhttplib.interceptor.MediaTypeInterceptor;
 import com.okhttplib.interceptor.MsgInterceptor;
 import com.okhttplib.interceptor.ParamsInterceptor;
+import com.okhttplib.manage.cookie.CookieManage;
 
 import java.util.List;
 
@@ -45,7 +46,9 @@ public abstract class BasicPerformer {
                 connectTimeout(config.getConnectTimeOut(), config.getTimeUnit()).
                 readTimeout(config.getReadTimeOut(), config.getTimeUnit()).
                 writeTimeout(config.getWriteTimeOut(), config.getTimeUnit());
-
+        if (config.isCookiesJar()) {
+            builder.cookieJar(new CookieManage(config));
+        }
         return builder;
     }
 

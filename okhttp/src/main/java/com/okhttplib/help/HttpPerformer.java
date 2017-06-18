@@ -9,7 +9,7 @@ import com.okhttplib.annotation.RequestMethod;
 import com.okhttplib.bean.RequestMessage;
 import com.okhttplib.bean.UploadFileInfo;
 import com.okhttplib.callback.OnResultCallBack;
-import com.okhttplib.config.Configuration;
+import com.okhttplib.Configuration;
 import com.okhttplib.handler.HttpMainHandler;
 import com.okhttplib.manage.BasicCallManage;
 

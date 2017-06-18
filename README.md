@@ -35,6 +35,8 @@
 
 然后引入下面这个包：
 
+    compile 'com.github.Zhongzien:xe_okhttp:v2.1.1'
+
 <2>.Configuration 配置
 
     Configuration.getConfigBuilder(this).addParamsInterceptor(new MyInterceptor()).bindConfig();

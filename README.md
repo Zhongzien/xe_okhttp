@@ -168,89 +168,57 @@ get 请求同样可以使用 post 请求的传参方式，框架会自动把 URL
 
 ##5.API
 
-class com.okhttplib.OkHttpInter
+>class com.okhttplib.OkHttpInter
 
-/**
-* 异步 post 请求
-* @param callBack 网络访问回调接口
-*/
-
+>>异步 post 请求  
+@param callBack 网络访问回调接口  
 void doPostAsync(OnResultCallBack callBack) 
 
-/**
-* 异步 get 请求
-* @param callBack 网络访问回调接口
-*/
+>>异步 get 请求  
+@param callBack 网络访问回调接口  
+**void doGetAsync(OnResultCallBack callBack)**
 
-void doGetAsync(OnResultCallBack callBack) 
+>>同步 post 请求  
+@param callBack 网络访问回调接口  
+**void doPostSync(OnResultCallBack callBack)**
 
-/**
-* 同步 post 请求
-* @param callBack 网络访问回调接口
-*/
+>>同步 get 请求  
+@param callBack 网络访问回调接口  
+**void doGetSync(OnResultCallBack callBack)**
 
-void doPostSync(OnResultCallBack callBack) 
+>>文件上传  
+@param callBack 网络访问回调接口  
+**void doUploadAsync(OnResultCallBack callBack)**
 
-/**
-* 同步 get 请求
-* @param callBack 网络访问回调接口
-*/
+>>文件下载  
+**void doDownloadAsync()**
 
-void doGetSync(OnResultCallBack callBack) 
+>>用于网络访问分组管理，向分组集合中添加新的 call  
+@param key 分组标识 不能为 null  
+@param call 需要管理的请求  
+**static void putCall(String key, Call call)**
 
-/**
-* 文件上传
-* @param callBack 网络访问回调接口
-*/
+>>用于网络访问分组管理，根据 key 删除 key 标识的分组集合元素  
+@param key 分组标识 不能为 null  
+**static void removeCallOrSet(String key)**
 
-void doUploadAsync(OnResultCallBack callBack)
+>>用于网络访问分组管理，根据 key 和 call 删除分组集合元素，如果 call 为 null 删除 key 标识的分组集合元素  
+@param key 分组标识 不能为 null  
+@param call 需要管理的请求  
+**static void removeCallOrSer(String key, Call call)**
 
-/**
-* 文件下载
-*/
-void doDownloadAsync()
 
-/**
-* 用于网络访问分组管理，向分组集合中添加新的 call
-* @param key 分组标识 不能为 null
-* @param call 需要管理的请求
-*/
+>>用于网络访问分组管理，根据 key 和 call 删除分组集合元素，如果 call 为 null 操作无效  
+@param key 分组标识 不能为 null  
+@param call 需要管理的请求  
+**static void removeCall(String key, Call call)**
 
-static void putCall(String key, Call call)
 
-/**
-* 用于网络访问分组管理，根据 key 删除 key 标识的分组集合元素
-* @param key 分组标识 不能为 null
-*/
+>>根据 key 标识停止下载  
+@param key 不能为 null  
+**static void stop(String key)**
 
- static void removeCallOrSet(String key)
+>>根据 key 标识暂停下载  
+@param key 不能为 null  
+**static void pause(String key)**
 
-/**
-* 用于网络访问分组管理，根据 key 和 call 删除分组集合元素，如果 call 为 null 删除 key 标识的分组集合元素
-* @param key 分组标识 不能为 null
-* @param call 需要管理的请求
-*/
-
-static void removeCallOrSer(String key, Call call)
-
-/**
-* 用于网络访问分组管理，根据 key 和 call 删除分组集合元素，如果 call 为 null 操作无效
-* @param key 分组标识 不能为 null
-* @param call 需要管理的请求
-*/
-
-static void removeCall(String key, Call call)
-
-/**
-* 根据 key 标识停止下载
-* @param key 不能为 null
-*/
-
-static void stop(String key)
-
-/**
-* 根据 key 标识暂停下载
-* @param key 不能为 null
-*/
-
-static void pause(String key)

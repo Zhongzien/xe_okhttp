@@ -1,11 +1,8 @@
 # xe_okhttp使用手册
-
 由于我是用公司的接口来测试的这里就不提供接口和数据
 
 ##1.配置
-
-<1>.gradle 配置
-
+1. gradle 配置  
 在 project 最外层的 gradle 中加入注释 ⑴ 的代码 
 
     // Top-level build file where you can add configuration options common to all sub-projects/modules.
@@ -37,17 +34,15 @@
 
     compile 'com.github.Zhongzien:xe_okhttp:v2.1.1'
 
-<2>.Configuration 配置
+2. Configuration 配置
 
     Configuration.getConfigBuilder(this).addParamsInterceptor(new MyInterceptor()).bindConfig();
 
-说明：
-
+说明：  
 Configuration 的配置建议在 Application 中进行配置，且整个程序有且只有一个 Configuration ；在实际应用中如果没有特殊需求可以不配 Configuration ，系统会默认配置。
 
 ##2.网络请求：
-
-<1>.异步post请求：
+1. 异步post请求：
     
             OkHttpInvoker.getBuilder().setUrl(url)
                     .setCallTag(tag) // ①
@@ -64,7 +59,7 @@ Configuration 的配置建议在 Application 中进行配置，且整个程序�
                 }
             });
             
-<2>.同步post请求：
+2. 同步post请求：
 
             new Thread(new Runnable() {
                 @Override
@@ -86,7 +81,7 @@ Configuration 的配置建议在 Application 中进行配置，且整个程序�
                 }
             }).start();
             
-<3>.异步get请求：
+3. 异步get请求：
     
             OkHttpInvoker.getBuilder().setUrl(url)
                     .setCallTag(tag) // ①
@@ -101,7 +96,7 @@ Configuration 的配置建议在 Application 中进行配置，且整个程序�
                 }
             });
 
-<4>.同步get请求:
+4. 同步get请求:
 
             new Thread(new Runnable() {
                 @Override
@@ -122,10 +117,8 @@ Configuration 的配置建议在 Application 中进行配置，且整个程序�
                 }
             }).start();
             
-说明：
-
-get 请求同样可以使用 post 请求的传参方式，框架会自动把 URL 拼接完整。
-
+说明：  
+get 请求同样可以使用 post 请求的传参方式，框架会自动把 URL 拼接完整。  
 上面注释 ① 处代码如果不需要对网络访问进行分组管理可以不调用，不会对程序正常运行造成影响。若调用了该方法可以把分组管理交由程序去完成，也可以自行对分组进行管理，管理所需方法见 API 。
 
 ##3.文件上传
@@ -143,8 +136,7 @@ get 请求同样可以使用 post 请求的传参方式，框架会自动把 URL
                 }
             });
      
-说明：
-
+* 说明：  
 文件上传支持单文件上传、多文件上传、批量上传，上传的同时可以带除文件信息以外信息一起上传。
 
 #4.文件下载
@@ -162,8 +154,7 @@ get 请求同样可以使用 post 请求的传参方式，框架会自动把 URL
                         }
                     }).build().doDownloadAsync();
                     
-说明：
-
+* 说明：  
 文件下载支持批量加载，支持断点下载。同一个文件可以重复下载，程序内置重名防止文件相互覆盖。
 
 ##5.API
